@@ -1,0 +1,6 @@
+libname tiny '/bks/proj/cbp/sas/data/tiny/tinyprod';
+libname tiny90 '/bks/proj/cbp/sas/data/tiny/tiny90';
+libname tiny80 '/bks/proj/cbp/sas/data/tiny/tiny80';
+libname may9 '/bks/proj/cbp/sas/data/may9';
+libname library '/bks/proj/cbp/sas/data/library';
+libname nic '/rsma/microdata/nicua/';

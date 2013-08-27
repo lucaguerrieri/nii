@@ -1,0 +1,2298 @@
+1                                The SAS System  09:43 Thursday, August 22, 2013
+
+NOTE: Copyright (c) 2002-2010 by SAS Institute Inc., Cary, NC, USA. 
+NOTE: SAS (r) Proprietary Software 9.3 (TS1M1) 
+      Licensed to FEDERAL RESERVE BOARD OF GOVERNORS, Site 70116210.
+NOTE: This session is executing on the Linux 2.6.18-348.12.1.el5 (LIN X64) 
+      platform.
+
+
+
+NOTE: Updated analytical products:
+
+SAS/STAT 9.3_M1, SAS/ETS 9.3_M1
+
+Welcome to Linux SAS Version 9.3, which was put into production on
+October 31, 2012.
+
+Please direct questions to the Board's SAS Consulting Group (extension 
+2500, sas@frb.gov) or the ARC Section at extension 3700.
+
+--------------------------------------------------------------
+Obtaining assistance from the Board's SAS Consulting Group:
+SAS Consulting Group Hotline: ext 2500 (202-452-2500) M-F 8AM-630PM
+E-mail addresses:       Notes mail shortcut: "SAS Consulting Group"
+                        otherwise:           "sas@frb.gov"
+SAS Consulting Group FedWeb home page:
+           http://fedweb.frb.gov/fedweb/board/irm/sas/index.htm
+--------------------------------------------------------------
+
+
+NOTE: SAS initialization used:
+      real time           0.29 seconds
+      cpu time            0.04 seconds
+      
+
+NOTE: AUTOEXEC processing beginning; file is 
+      /sftwr/sas/9.3/SASFoundation/9.3/autoexec.sas.
+
+NOTE: Libref FRBFORMS was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /sftwr/sas/9.3/SASFoundation/9.3/sasforms
+
+NOTE: AUTOEXEC processing completed.
+
+1          /*******************************************************************
+2          Author: Michelle Welch (m1mrh02); Updated by Valentin Bolotnyy
+2        ! (m1vxb00)
+3          Date: March 28, 2012; Date Updated: November 20, 2012.
+4          Purpose: Pull Merger adjusted Y-9C (May9C) data from Banking Analysis
+5          Output: may9c_matchange.sas7bdat
+6          
+7          NOTE: nonintinc_tr_tra == the return on trading assets. You might see
+7        !  this
+8          labeled as return_tradingassets in other spreadsheets.
+9          ********************************************************************/
+10         * Old "Include" references;
+11         *%include './Include/library';
+12         *%include './Include/bcrmacros.sas';
+13         *%include './Include/PDMACRO.sas';
+2                                The SAS System  09:43 Thursday, August 22, 2013
+
+14         *%include './Include/setmay9.sas';
+15         *%include './Include/settiny.sas';
+16         
+17         * DO NOT CHANGE ANYTHING IN THIS SUBSECTION;
+18         %include '/ofs/research2/ofs_templates/BA_MACROS/antiny.sas';
+26         %include '/ofs/research2/ofs_templates/BA_MACROS/settiny.sas';
+3273       %include '/ofs/research2/ofs_templates/BA_MACROS/bcrmacros.sas';
+4984       %include '/ofs/research2/ofs_templates/BA_MACROS/MACRO.sas';
+6553       %include '/ofs/research2/ofs_templates/BA_MACROS/setmay9.sas';
+NOTE: Libref MAY9 was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /bks/proj/cbp/sas/data/may9
+8197       
+8198       libname nic           '/ofs/scratch2/m1reb02/';
+NOTE: Libref NIC was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /ofs/scratch2/m1reb02
+8199       libname tiny          '/bks/proj/cbp/sas/data/tiny';
+NOTE: Libref TINY was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /bks/proj/cbp/sas/data/tiny
+8200       libname tiny80        '/bks/proj/cbp/sas/data/tiny/tiny80';
+NOTE: Libref TINY80 was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /bks/proj/cbp/sas/data/tiny/tiny80
+8201       libname tiny90        '/bks/proj/cbp/sas/data/tiny/tiny90';
+NOTE: Libname TINY90 refers to the same physical library as TINY80.
+NOTE: Libref TINY90 was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /bks/proj/cbp/sas/data/tiny/tiny80
+8202       libname library       '/bks/proj/cbp/sas/data/library_64';
+NOTE: Libref LIBRARY was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /bks/proj/cbp/sas/data/library_64
+8203       libname may9c         '/bks/proj/cbp/sas/data/may9/ag';
+NOTE: Libref MAY9C was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /bks/proj/cbp/sas/data/may9/ag
+8204       
+8205       *This is the output directory*
+8206       libname out '/ofs/prod1/CCAR/noninterest_income/data';
+8207       
+8208       options sasautos=('/bks/proj/cbp/sas/pgms/tiny/macros',
+8209                         '/bks/proj/cbp/sas/pgms/uniform/macros',
+8210                         '!SASROOT/sasautos',
+8211                         '!SASROOT/frbmac');
+8212       
+8213       * CHANGE THINGS BELOW AS NECESSARY;
+8214       
+8215       %let fpath = /ofs/prod1/CCAR/noninterest_income/data;
+8216       libname nii "&fpath";
+NOTE: Libref NII was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /ofs/prod1/CCAR/noninterest_income/data
+8217       
+8218       %let sdate = 1990q1;
+8219       %let edate = 2012q4; *Change this as necessary*
+3                                The SAS System  09:43 Thursday, August 22, 2013
+
+8220       *retrieve MAY9 data;
+8221       %let mvars = entity BC01000 ACG0100 FI03350 FI03100 FI03150
+8222       FI03050 FI01250 FI04400 FI01775 FI01375
+8223       FI03300 FI04650 FI04300 FI04250 FI01800
+8224       FI01900 FI01850 FI01750 FI01700 ACP0850
+8225       ACP0900 FIA0800 FI01950 FI03200 FI03250
+8226       FI01300 FI02000 FI01350 FI04150 FI04200
+8227       FI04100 FI04050 FI04000 FI01650
+8228       ;
+8229       
+8230       %let rmvars = entity assets credit_loss_allowances
+8230     ! card_interchange_fees earnings_life_insurance
+8231       atm_fees check_printing_fees fiduciary_activities sale_mutual_funds
+8231     ! insurcance_commissions
+8232       investment_banking_fees net_change_fair_value ng_assets_fv
+8232     ! ng_credit_deriv ng_sale_loans
+8233       ng_other_assets ng_other_real_estate net_sec_income
+8233     ! net_servicing_fees res_mortgages_closed
+8234       res_mortgages_open other_adj_equity other_nii rent_other_real_estate
+8234     ! safe_deposit_rent
+8235       service_charges total_nii total_tr tr_comm tr_credit tr_equity
+8235     ! tr_foreign_ex tr_int_rt_exp
+8236       vc_rev
+8237                     ;
+8238       
+8239       %setmay9(dates=%dateseq(&sdate,&edate),tsindex=date,kvars=&mvars,outd
+8239     ! s=may9_raw);
+
+NOTE: There were 1580 observations read from the data set MAY9.MAY99003.
+NOTE: The data set WORK.BIGG has 1580 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           6.24 seconds
+      cpu time            0.09 seconds
+      
+
+
+NOTE: There were 1580 observations read from the data set WORK.BIGG.
+NOTE: The data set WORK.MAY9_RAW has 1580 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 1604 observations read from the data set MAY9.MAY99006.
+NOTE: The data set WORK.BIGG has 1604 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.66 seconds
+      cpu time            0.08 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1604 observations read from the data set WORK.BIGG.
+NOTE: 1604 observations added.
+NOTE: The data set WORK.MAY9_RAW has 3184 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+4                                The SAS System  09:43 Thursday, August 22, 2013
+
+      real time           0.03 seconds
+      cpu time            0.02 seconds
+      
+
+
+NOTE: There were 1609 observations read from the data set MAY9.MAY99009.
+NOTE: The data set WORK.BIGG has 1609 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.71 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1609 observations read from the data set WORK.BIGG.
+NOTE: 1609 observations added.
+NOTE: The data set WORK.MAY9_RAW has 4793 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 1528 observations read from the data set MAY9.MAY99012.
+NOTE: The data set WORK.BIGG has 1528 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.40 seconds
+      cpu time            0.08 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1528 observations read from the data set WORK.BIGG.
+NOTE: 1528 observations added.
+NOTE: The data set WORK.MAY9_RAW has 6321 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1532 observations read from the data set MAY9.MAY99103.
+NOTE: The data set WORK.BIGG has 1532 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.87 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1532 observations read from the data set WORK.BIGG.
+NOTE: 1532 observations added.
+NOTE: The data set WORK.MAY9_RAW has 7853 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+5                                The SAS System  09:43 Thursday, August 22, 2013
+
+
+
+NOTE: There were 1530 observations read from the data set MAY9.MAY99106.
+NOTE: The data set WORK.BIGG has 1530 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           1.51 seconds
+      cpu time            0.08 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1530 observations read from the data set WORK.BIGG.
+NOTE: 1530 observations added.
+NOTE: The data set WORK.MAY9_RAW has 9383 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 1528 observations read from the data set MAY9.MAY99109.
+NOTE: The data set WORK.BIGG has 1528 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.70 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1528 observations read from the data set WORK.BIGG.
+NOTE: 1528 observations added.
+NOTE: The data set WORK.MAY9_RAW has 10911 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 1534 observations read from the data set MAY9.MAY99112.
+NOTE: The data set WORK.BIGG has 1534 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.43 seconds
+      cpu time            0.08 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1534 observations read from the data set WORK.BIGG.
+NOTE: 1534 observations added.
+NOTE: The data set WORK.MAY9_RAW has 12445 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1553 observations read from the data set MAY9.MAY99203.
+6                                The SAS System  09:43 Thursday, August 22, 2013
+
+NOTE: The data set WORK.BIGG has 1553 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.37 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1553 observations read from the data set WORK.BIGG.
+NOTE: 1553 observations added.
+NOTE: The data set WORK.MAY9_RAW has 13998 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1558 observations read from the data set MAY9.MAY99206.
+NOTE: The data set WORK.BIGG has 1558 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.35 seconds
+      cpu time            0.08 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1558 observations read from the data set WORK.BIGG.
+NOTE: 1558 observations added.
+NOTE: The data set WORK.MAY9_RAW has 15556 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1556 observations read from the data set MAY9.MAY99209.
+NOTE: The data set WORK.BIGG has 1556 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.31 seconds
+      cpu time            0.08 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1556 observations read from the data set WORK.BIGG.
+NOTE: 1556 observations added.
+NOTE: The data set WORK.MAY9_RAW has 17112 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1565 observations read from the data set MAY9.MAY99212.
+NOTE: The data set WORK.BIGG has 1565 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.34 seconds
+7                                The SAS System  09:43 Thursday, August 22, 2013
+
+      cpu time            0.09 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1565 observations read from the data set WORK.BIGG.
+NOTE: 1565 observations added.
+NOTE: The data set WORK.MAY9_RAW has 18677 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1559 observations read from the data set MAY9.MAY99303.
+NOTE: The data set WORK.BIGG has 1559 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.32 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1559 observations read from the data set WORK.BIGG.
+NOTE: 1559 observations added.
+NOTE: The data set WORK.MAY9_RAW has 20236 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1540 observations read from the data set MAY9.MAY99306.
+NOTE: The data set WORK.BIGG has 1540 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.32 seconds
+      cpu time            0.08 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1540 observations read from the data set WORK.BIGG.
+NOTE: 1540 observations added.
+NOTE: The data set WORK.MAY9_RAW has 21776 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1545 observations read from the data set MAY9.MAY99309.
+NOTE: The data set WORK.BIGG has 1545 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.21 seconds
+      cpu time            0.09 seconds
+      
+
+8                                The SAS System  09:43 Thursday, August 22, 2013
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1545 observations read from the data set WORK.BIGG.
+NOTE: 1545 observations added.
+NOTE: The data set WORK.MAY9_RAW has 23321 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1545 observations read from the data set MAY9.MAY99312.
+NOTE: The data set WORK.BIGG has 1545 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.29 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1545 observations read from the data set WORK.BIGG.
+NOTE: 1545 observations added.
+NOTE: The data set WORK.MAY9_RAW has 24866 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1534 observations read from the data set MAY9.MAY99403.
+NOTE: The data set WORK.BIGG has 1534 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.28 seconds
+      cpu time            0.08 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1534 observations read from the data set WORK.BIGG.
+NOTE: 1534 observations added.
+NOTE: The data set WORK.MAY9_RAW has 26400 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1254 observations read from the data set MAY9.MAY99406.
+NOTE: The data set WORK.BIGG has 1254 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.25 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1254 observations read from the data set WORK.BIGG.
+9                                The SAS System  09:43 Thursday, August 22, 2013
+
+NOTE: 1254 observations added.
+NOTE: The data set WORK.MAY9_RAW has 27654 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1239 observations read from the data set MAY9.MAY99409.
+NOTE: The data set WORK.BIGG has 1239 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.22 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1239 observations read from the data set WORK.BIGG.
+NOTE: 1239 observations added.
+NOTE: The data set WORK.MAY9_RAW has 28893 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1265 observations read from the data set MAY9.MAY99412.
+NOTE: The data set WORK.BIGG has 1265 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.86 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1265 observations read from the data set WORK.BIGG.
+NOTE: 1265 observations added.
+NOTE: The data set WORK.MAY9_RAW has 30158 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1260 observations read from the data set MAY9.MAY99503.
+NOTE: The data set WORK.BIGG has 1260 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.21 seconds
+      cpu time            0.06 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1260 observations read from the data set WORK.BIGG.
+NOTE: 1260 observations added.
+NOTE: The data set WORK.MAY9_RAW has 31418 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+10                               The SAS System  09:43 Thursday, August 22, 2013
+
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 1263 observations read from the data set MAY9.MAY99506.
+NOTE: The data set WORK.BIGG has 1263 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.18 seconds
+      cpu time            0.06 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1263 observations read from the data set WORK.BIGG.
+NOTE: 1263 observations added.
+NOTE: The data set WORK.MAY9_RAW has 32681 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 1266 observations read from the data set MAY9.MAY99509.
+NOTE: The data set WORK.BIGG has 1266 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.29 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1266 observations read from the data set WORK.BIGG.
+NOTE: 1266 observations added.
+NOTE: The data set WORK.MAY9_RAW has 33947 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1298 observations read from the data set MAY9.MAY99512.
+NOTE: The data set WORK.BIGG has 1298 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.67 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1298 observations read from the data set WORK.BIGG.
+NOTE: 1298 observations added.
+NOTE: The data set WORK.MAY9_RAW has 35245 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+11                               The SAS System  09:43 Thursday, August 22, 2013
+
+
+
+NOTE: There were 1310 observations read from the data set MAY9.MAY99603.
+NOTE: The data set WORK.BIGG has 1310 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           1.45 seconds
+      cpu time            0.08 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1310 observations read from the data set WORK.BIGG.
+NOTE: 1310 observations added.
+NOTE: The data set WORK.MAY9_RAW has 36555 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 1319 observations read from the data set MAY9.MAY99606.
+NOTE: The data set WORK.BIGG has 1319 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.60 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1319 observations read from the data set WORK.BIGG.
+NOTE: 1319 observations added.
+NOTE: The data set WORK.MAY9_RAW has 37874 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1334 observations read from the data set MAY9.MAY99609.
+NOTE: The data set WORK.BIGG has 1334 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           1.35 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1334 observations read from the data set WORK.BIGG.
+NOTE: 1334 observations added.
+NOTE: The data set WORK.MAY9_RAW has 39208 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 1360 observations read from the data set MAY9.MAY99612.
+12                               The SAS System  09:43 Thursday, August 22, 2013
+
+NOTE: The data set WORK.BIGG has 1360 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.32 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1360 observations read from the data set WORK.BIGG.
+NOTE: 1360 observations added.
+NOTE: The data set WORK.MAY9_RAW has 40568 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1385 observations read from the data set MAY9.MAY99703.
+NOTE: The data set WORK.BIGG has 1385 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.33 seconds
+      cpu time            0.08 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1385 observations read from the data set WORK.BIGG.
+NOTE: 1385 observations added.
+NOTE: The data set WORK.MAY9_RAW has 41953 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1392 observations read from the data set MAY9.MAY99706.
+NOTE: The data set WORK.BIGG has 1392 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.50 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1392 observations read from the data set WORK.BIGG.
+NOTE: 1392 observations added.
+NOTE: The data set WORK.MAY9_RAW has 43345 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1444 observations read from the data set MAY9.MAY99709.
+NOTE: The data set WORK.BIGG has 1444 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           1.08 seconds
+13                               The SAS System  09:43 Thursday, August 22, 2013
+
+      cpu time            0.09 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1444 observations read from the data set WORK.BIGG.
+NOTE: 1444 observations added.
+NOTE: The data set WORK.MAY9_RAW has 44789 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1481 observations read from the data set MAY9.MAY99712.
+NOTE: The data set WORK.BIGG has 1481 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.68 seconds
+      cpu time            0.08 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1481 observations read from the data set WORK.BIGG.
+NOTE: 1481 observations added.
+NOTE: The data set WORK.MAY9_RAW has 46270 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1478 observations read from the data set MAY9.MAY99803.
+NOTE: The data set WORK.BIGG has 1478 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.37 seconds
+      cpu time            0.09 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1478 observations read from the data set WORK.BIGG.
+NOTE: 1478 observations added.
+NOTE: The data set WORK.MAY9_RAW has 47748 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1516 observations read from the data set MAY9.MAY99806.
+NOTE: The data set WORK.BIGG has 1516 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.31 seconds
+      cpu time            0.09 seconds
+      
+
+14                               The SAS System  09:43 Thursday, August 22, 2013
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1516 observations read from the data set WORK.BIGG.
+NOTE: 1516 observations added.
+NOTE: The data set WORK.MAY9_RAW has 49264 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1550 observations read from the data set MAY9.MAY99809.
+NOTE: The data set WORK.BIGG has 1550 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.27 seconds
+      cpu time            0.09 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1550 observations read from the data set WORK.BIGG.
+NOTE: 1550 observations added.
+NOTE: The data set WORK.MAY9_RAW has 50814 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1593 observations read from the data set MAY9.MAY99812.
+NOTE: The data set WORK.BIGG has 1593 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.29 seconds
+      cpu time            0.09 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1593 observations read from the data set WORK.BIGG.
+NOTE: 1593 observations added.
+NOTE: The data set WORK.MAY9_RAW has 52407 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1612 observations read from the data set MAY9.MAY99903.
+NOTE: The data set WORK.BIGG has 1612 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.72 seconds
+      cpu time            0.08 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1612 observations read from the data set WORK.BIGG.
+15                               The SAS System  09:43 Thursday, August 22, 2013
+
+NOTE: 1612 observations added.
+NOTE: The data set WORK.MAY9_RAW has 54019 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1623 observations read from the data set MAY9.MAY99906.
+NOTE: The data set WORK.BIGG has 1623 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.29 seconds
+      cpu time            0.10 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1623 observations read from the data set WORK.BIGG.
+NOTE: 1623 observations added.
+NOTE: The data set WORK.MAY9_RAW has 55642 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1636 observations read from the data set MAY9.MAY99909.
+NOTE: The data set WORK.BIGG has 1636 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.66 seconds
+      cpu time            0.08 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1636 observations read from the data set WORK.BIGG.
+NOTE: 1636 observations added.
+NOTE: The data set WORK.MAY9_RAW has 57278 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 1678 observations read from the data set MAY9.MAY99912.
+NOTE: The data set WORK.BIGG has 1678 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           1.21 seconds
+      cpu time            0.09 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1678 observations read from the data set WORK.BIGG.
+NOTE: 1678 observations added.
+NOTE: The data set WORK.MAY9_RAW has 58956 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+16                               The SAS System  09:43 Thursday, August 22, 2013
+
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1690 observations read from the data set MAY9.MAY90003.
+NOTE: The data set WORK.BIGG has 1690 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.70 seconds
+      cpu time            0.08 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1690 observations read from the data set WORK.BIGG.
+NOTE: 1690 observations added.
+NOTE: The data set WORK.MAY9_RAW has 60646 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 1702 observations read from the data set MAY9.MAY90006.
+NOTE: The data set WORK.BIGG has 1702 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.35 seconds
+      cpu time            0.08 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1702 observations read from the data set WORK.BIGG.
+NOTE: 1702 observations added.
+NOTE: The data set WORK.MAY9_RAW has 62348 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1733 observations read from the data set MAY9.MAY90009.
+NOTE: The data set WORK.BIGG has 1733 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.38 seconds
+      cpu time            0.09 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1733 observations read from the data set WORK.BIGG.
+NOTE: 1733 observations added.
+NOTE: The data set WORK.MAY9_RAW has 64081 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+17                               The SAS System  09:43 Thursday, August 22, 2013
+
+
+
+NOTE: There were 1751 observations read from the data set MAY9.MAY90012.
+NOTE: The data set WORK.BIGG has 1751 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.28 seconds
+      cpu time            0.09 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1751 observations read from the data set WORK.BIGG.
+NOTE: 1751 observations added.
+NOTE: The data set WORK.MAY9_RAW has 65832 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1775 observations read from the data set MAY9.MAY90103.
+NOTE: The data set WORK.BIGG has 1775 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.30 seconds
+      cpu time            0.11 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1775 observations read from the data set WORK.BIGG.
+NOTE: 1775 observations added.
+NOTE: The data set WORK.MAY9_RAW has 67607 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1815 observations read from the data set MAY9.MAY90106.
+NOTE: The data set WORK.BIGG has 1815 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.52 seconds
+      cpu time            0.09 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1815 observations read from the data set WORK.BIGG.
+NOTE: 1815 observations added.
+NOTE: The data set WORK.MAY9_RAW has 69422 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1853 observations read from the data set MAY9.MAY90109.
+18                               The SAS System  09:43 Thursday, August 22, 2013
+
+NOTE: The data set WORK.BIGG has 1853 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.33 seconds
+      cpu time            0.10 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1853 observations read from the data set WORK.BIGG.
+NOTE: 1853 observations added.
+NOTE: The data set WORK.MAY9_RAW has 71275 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1874 observations read from the data set MAY9.MAY90112.
+NOTE: The data set WORK.BIGG has 1874 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.28 seconds
+      cpu time            0.09 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1874 observations read from the data set WORK.BIGG.
+NOTE: 1874 observations added.
+NOTE: The data set WORK.MAY9_RAW has 73149 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 1897 observations read from the data set MAY9.MAY90203.
+NOTE: The data set WORK.BIGG has 1897 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.29 seconds
+      cpu time            0.08 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1897 observations read from the data set WORK.BIGG.
+NOTE: 1897 observations added.
+NOTE: The data set WORK.MAY9_RAW has 75046 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 1919 observations read from the data set MAY9.MAY90206.
+NOTE: The data set WORK.BIGG has 1919 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.29 seconds
+19                               The SAS System  09:43 Thursday, August 22, 2013
+
+      cpu time            0.09 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1919 observations read from the data set WORK.BIGG.
+NOTE: 1919 observations added.
+NOTE: The data set WORK.MAY9_RAW has 76965 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1960 observations read from the data set MAY9.MAY90209.
+NOTE: The data set WORK.BIGG has 1960 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.31 seconds
+      cpu time            0.10 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1960 observations read from the data set WORK.BIGG.
+NOTE: 1960 observations added.
+NOTE: The data set WORK.MAY9_RAW has 78925 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 2004 observations read from the data set MAY9.MAY90212.
+NOTE: The data set WORK.BIGG has 2004 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.29 seconds
+      cpu time            0.10 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 2004 observations read from the data set WORK.BIGG.
+NOTE: 2004 observations added.
+NOTE: The data set WORK.MAY9_RAW has 80929 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 2040 observations read from the data set MAY9.MAY90303.
+NOTE: The data set WORK.BIGG has 2040 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.33 seconds
+      cpu time            0.09 seconds
+      
+
+20                               The SAS System  09:43 Thursday, August 22, 2013
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 2040 observations read from the data set WORK.BIGG.
+NOTE: 2040 observations added.
+NOTE: The data set WORK.MAY9_RAW has 82969 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 2072 observations read from the data set MAY9.MAY90306.
+NOTE: The data set WORK.BIGG has 2072 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.30 seconds
+      cpu time            0.10 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 2072 observations read from the data set WORK.BIGG.
+NOTE: 2072 observations added.
+NOTE: The data set WORK.MAY9_RAW has 85041 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 2132 observations read from the data set MAY9.MAY90309.
+NOTE: The data set WORK.BIGG has 2132 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.26 seconds
+      cpu time            0.11 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 2132 observations read from the data set WORK.BIGG.
+NOTE: 2132 observations added.
+NOTE: The data set WORK.MAY9_RAW has 87173 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 2156 observations read from the data set MAY9.MAY90312.
+NOTE: The data set WORK.BIGG has 2156 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.27 seconds
+      cpu time            0.10 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 2156 observations read from the data set WORK.BIGG.
+21                               The SAS System  09:43 Thursday, August 22, 2013
+
+NOTE: 2156 observations added.
+NOTE: The data set WORK.MAY9_RAW has 89329 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 2204 observations read from the data set MAY9.MAY90403.
+NOTE: The data set WORK.BIGG has 2204 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.33 seconds
+      cpu time            0.12 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 2204 observations read from the data set WORK.BIGG.
+NOTE: 2204 observations added.
+NOTE: The data set WORK.MAY9_RAW has 91533 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 2221 observations read from the data set MAY9.MAY90406.
+NOTE: The data set WORK.BIGG has 2221 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.30 seconds
+      cpu time            0.10 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 2221 observations read from the data set WORK.BIGG.
+NOTE: 2221 observations added.
+NOTE: The data set WORK.MAY9_RAW has 93754 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 2262 observations read from the data set MAY9.MAY90409.
+NOTE: The data set WORK.BIGG has 2262 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.30 seconds
+      cpu time            0.11 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 2262 observations read from the data set WORK.BIGG.
+NOTE: 2262 observations added.
+NOTE: The data set WORK.MAY9_RAW has 96016 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+22                               The SAS System  09:43 Thursday, August 22, 2013
+
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 2287 observations read from the data set MAY9.MAY90412.
+NOTE: The data set WORK.BIGG has 2287 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.31 seconds
+      cpu time            0.10 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 2287 observations read from the data set WORK.BIGG.
+NOTE: 2287 observations added.
+NOTE: The data set WORK.MAY9_RAW has 98303 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 2292 observations read from the data set MAY9.MAY90503.
+NOTE: The data set WORK.BIGG has 2292 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.57 seconds
+      cpu time            0.12 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 2292 observations read from the data set WORK.BIGG.
+NOTE: 2292 observations added.
+NOTE: The data set WORK.MAY9_RAW has 100595 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 2304 observations read from the data set MAY9.MAY90506.
+NOTE: The data set WORK.BIGG has 2304 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.32 seconds
+      cpu time            0.11 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 2304 observations read from the data set WORK.BIGG.
+NOTE: 2304 observations added.
+NOTE: The data set WORK.MAY9_RAW has 102899 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+23                               The SAS System  09:43 Thursday, August 22, 2013
+
+
+
+NOTE: There were 2304 observations read from the data set MAY9.MAY90509.
+NOTE: The data set WORK.BIGG has 2304 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.31 seconds
+      cpu time            0.12 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 2304 observations read from the data set WORK.BIGG.
+NOTE: 2304 observations added.
+NOTE: The data set WORK.MAY9_RAW has 105203 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 2291 observations read from the data set MAY9.MAY90512.
+NOTE: The data set WORK.BIGG has 2291 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.37 seconds
+      cpu time            0.11 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 2291 observations read from the data set WORK.BIGG.
+NOTE: 2291 observations added.
+NOTE: The data set WORK.MAY9_RAW has 107494 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 2255 observations read from the data set MAY9.MAY90603.
+NOTE: The data set WORK.BIGG has 2255 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.45 seconds
+      cpu time            0.14 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 2255 observations read from the data set WORK.BIGG.
+NOTE: 2255 observations added.
+NOTE: The data set WORK.MAY9_RAW has 109749 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 999 observations read from the data set MAY9.MAY90606.
+24                               The SAS System  09:43 Thursday, August 22, 2013
+
+NOTE: The data set WORK.BIGG has 999 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.25 seconds
+      cpu time            0.09 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 999 observations read from the data set WORK.BIGG.
+NOTE: 999 observations added.
+NOTE: The data set WORK.MAY9_RAW has 110748 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1001 observations read from the data set MAY9.MAY90609.
+NOTE: The data set WORK.BIGG has 1001 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.21 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1001 observations read from the data set WORK.BIGG.
+NOTE: 1001 observations added.
+NOTE: The data set WORK.MAY9_RAW has 111749 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 998 observations read from the data set MAY9.MAY90612.
+NOTE: The data set WORK.BIGG has 998 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.21 seconds
+      cpu time            0.06 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 998 observations read from the data set WORK.BIGG.
+NOTE: 998 observations added.
+NOTE: The data set WORK.MAY9_RAW has 112747 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 989 observations read from the data set MAY9.MAY90703.
+NOTE: The data set WORK.BIGG has 989 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.23 seconds
+25                               The SAS System  09:43 Thursday, August 22, 2013
+
+      cpu time            0.06 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 989 observations read from the data set WORK.BIGG.
+NOTE: 989 observations added.
+NOTE: The data set WORK.MAY9_RAW has 113736 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 985 observations read from the data set MAY9.MAY90706.
+NOTE: The data set WORK.BIGG has 985 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.26 seconds
+      cpu time            0.06 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 985 observations read from the data set WORK.BIGG.
+NOTE: 985 observations added.
+NOTE: The data set WORK.MAY9_RAW has 114721 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 984 observations read from the data set MAY9.MAY90709.
+NOTE: The data set WORK.BIGG has 984 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.23 seconds
+      cpu time            0.06 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 984 observations read from the data set WORK.BIGG.
+NOTE: 984 observations added.
+NOTE: The data set WORK.MAY9_RAW has 115705 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 984 observations read from the data set MAY9.MAY90712.
+NOTE: The data set WORK.BIGG has 984 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.22 seconds
+      cpu time            0.06 seconds
+      
+
+26                               The SAS System  09:43 Thursday, August 22, 2013
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 984 observations read from the data set WORK.BIGG.
+NOTE: 984 observations added.
+NOTE: The data set WORK.MAY9_RAW has 116689 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 986 observations read from the data set MAY9.MAY90803.
+NOTE: The data set WORK.BIGG has 986 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.23 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 986 observations read from the data set WORK.BIGG.
+NOTE: 986 observations added.
+NOTE: The data set WORK.MAY9_RAW has 117675 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 978 observations read from the data set MAY9.MAY90806.
+NOTE: The data set WORK.BIGG has 978 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.24 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 978 observations read from the data set WORK.BIGG.
+NOTE: 978 observations added.
+NOTE: The data set WORK.MAY9_RAW has 118653 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 984 observations read from the data set MAY9.MAY90809.
+NOTE: The data set WORK.BIGG has 984 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.28 seconds
+      cpu time            0.06 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 984 observations read from the data set WORK.BIGG.
+27                               The SAS System  09:43 Thursday, August 22, 2013
+
+NOTE: 984 observations added.
+NOTE: The data set WORK.MAY9_RAW has 119637 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 991 observations read from the data set MAY9.MAY90812.
+NOTE: The data set WORK.BIGG has 991 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.23 seconds
+      cpu time            0.06 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 991 observations read from the data set WORK.BIGG.
+NOTE: 991 observations added.
+NOTE: The data set WORK.MAY9_RAW has 120628 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1041 observations read from the data set MAY9.MAY90903.
+NOTE: The data set WORK.BIGG has 1041 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.28 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1041 observations read from the data set WORK.BIGG.
+NOTE: 1041 observations added.
+NOTE: The data set WORK.MAY9_RAW has 121669 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1033 observations read from the data set MAY9.MAY90906.
+NOTE: The data set WORK.BIGG has 1033 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.31 seconds
+      cpu time            0.05 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1033 observations read from the data set WORK.BIGG.
+NOTE: 1033 observations added.
+NOTE: The data set WORK.MAY9_RAW has 122702 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+28                               The SAS System  09:43 Thursday, August 22, 2013
+
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1038 observations read from the data set MAY9.MAY90909.
+NOTE: The data set WORK.BIGG has 1038 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           1.45 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1038 observations read from the data set WORK.BIGG.
+NOTE: 1038 observations added.
+NOTE: The data set WORK.MAY9_RAW has 123740 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1042 observations read from the data set MAY9.MAY90912.
+NOTE: The data set WORK.BIGG has 1042 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.56 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1042 observations read from the data set WORK.BIGG.
+NOTE: 1042 observations added.
+NOTE: The data set WORK.MAY9_RAW has 124782 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1062 observations read from the data set MAY9.MAY91003.
+NOTE: The data set WORK.BIGG has 1062 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.99 seconds
+      cpu time            0.06 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1062 observations read from the data set WORK.BIGG.
+NOTE: 1062 observations added.
+NOTE: The data set WORK.MAY9_RAW has 125844 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+29                               The SAS System  09:43 Thursday, August 22, 2013
+
+
+
+NOTE: There were 1046 observations read from the data set MAY9.MAY91006.
+NOTE: The data set WORK.BIGG has 1046 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.79 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1046 observations read from the data set WORK.BIGG.
+NOTE: 1046 observations added.
+NOTE: The data set WORK.MAY9_RAW has 126890 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1049 observations read from the data set MAY9.MAY91009.
+NOTE: The data set WORK.BIGG has 1049 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.75 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1049 observations read from the data set WORK.BIGG.
+NOTE: 1049 observations added.
+NOTE: The data set WORK.MAY9_RAW has 127939 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1055 observations read from the data set MAY9.MAY91012.
+NOTE: The data set WORK.BIGG has 1055 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           1.12 seconds
+      cpu time            0.06 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1055 observations read from the data set WORK.BIGG.
+NOTE: 1055 observations added.
+NOTE: The data set WORK.MAY9_RAW has 128994 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1042 observations read from the data set MAY9.MAY91103.
+30                               The SAS System  09:43 Thursday, August 22, 2013
+
+NOTE: The data set WORK.BIGG has 1042 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.70 seconds
+      cpu time            0.06 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1042 observations read from the data set WORK.BIGG.
+NOTE: 1042 observations added.
+NOTE: The data set WORK.MAY9_RAW has 130036 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1029 observations read from the data set MAY9.MAY91106.
+NOTE: The data set WORK.BIGG has 1029 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.47 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1029 observations read from the data set WORK.BIGG.
+NOTE: 1029 observations added.
+NOTE: The data set WORK.MAY9_RAW has 131065 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1033 observations read from the data set MAY9.MAY91109.
+NOTE: The data set WORK.BIGG has 1033 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           1.37 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1033 observations read from the data set WORK.BIGG.
+NOTE: 1033 observations added.
+NOTE: The data set WORK.MAY9_RAW has 132098 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1041 observations read from the data set MAY9.MAY91112.
+NOTE: The data set WORK.BIGG has 1041 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.58 seconds
+31                               The SAS System  09:43 Thursday, August 22, 2013
+
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1041 observations read from the data set WORK.BIGG.
+NOTE: 1041 observations added.
+NOTE: The data set WORK.MAY9_RAW has 133139 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1171 observations read from the data set MAY9.MAY91203.
+NOTE: The data set WORK.BIGG has 1171 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.53 seconds
+      cpu time            0.06 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1171 observations read from the data set WORK.BIGG.
+NOTE: 1171 observations added.
+NOTE: The data set WORK.MAY9_RAW has 134310 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1159 observations read from the data set MAY9.MAY91206.
+NOTE: The data set WORK.BIGG has 1159 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.49 seconds
+      cpu time            0.07 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1159 observations read from the data set WORK.BIGG.
+NOTE: 1159 observations added.
+NOTE: The data set WORK.MAY9_RAW has 135469 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1164 observations read from the data set MAY9.MAY91209.
+NOTE: The data set WORK.BIGG has 1164 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.99 seconds
+      cpu time            0.07 seconds
+      
+
+32                               The SAS System  09:43 Thursday, August 22, 2013
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1164 observations read from the data set WORK.BIGG.
+NOTE: 1164 observations added.
+NOTE: The data set WORK.MAY9_RAW has 136633 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1156 observations read from the data set MAY9.MAY91212.
+NOTE: The data set WORK.BIGG has 1156 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           1.05 seconds
+      cpu time            0.08 seconds
+      
+
+
+NOTE: Appending WORK.BIGG to WORK.MAY9_RAW.
+NOTE: There were 1156 observations read from the data set WORK.BIGG.
+NOTE: 1156 observations added.
+NOTE: The data set WORK.MAY9_RAW has 137789 observations and 38 variables.
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+8240       data may9; set may9_raw(rename=(%renamer1(&mvars,&rmvars))); run;
+
+NOTE: There were 137789 observations read from the data set WORK.MAY9_RAW.
+NOTE: The data set WORK.MAY9 has 137789 observations and 38 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.11 seconds
+      cpu time            0.11 seconds
+      
+
+8241       proc sort data=may9; by entity date; run;
+
+NOTE: There were 137789 observations read from the data set WORK.MAY9.
+NOTE: The data set WORK.MAY9 has 137789 observations and 38 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.21 seconds
+      cpu time            0.21 seconds
+      
+
+8242       
+8243        *keep only domestic banks;
+8244       data attr;
+8245            set nic.attr(keep=id_rssd d_dt_start d_dt_end domestic_ind
+8245     ! nm_short);
+8246       run;
+
+NOTE: There were 811986 observations read from the data set NIC.ATTR.
+NOTE: The data set WORK.ATTR has 811986 observations and 5 variables.
+NOTE: DATA statement used (Total process time):
+      real time           1:01.36
+33                               The SAS System  09:43 Thursday, August 22, 2013
+
+      cpu time            0.64 seconds
+      
+
+8247       
+8248       proc sql;
+8249         create table may9c_dm as
+8250         select t.*, a.*
+8251         from may9 t left join attr a on (t.entity=a.id_rssd)
+8252         where (d_dt_start <= date <= d_dt_end and domestic_ind="Y");
+NOTE: Table WORK.MAY9C_DM created, with 136902 rows and 43 columns.
+
+8253       quit;
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.80 seconds
+      cpu time            1.04 seconds
+      
+
+8254       
+8255       
+8256       *keep only top 25 BHCs;
+8257       proc sort data=may9c_dm; by date descending assets; run;
+
+NOTE: There were 136902 observations read from the data set WORK.MAY9C_DM.
+NOTE: The data set WORK.MAY9C_DM has 136902 observations and 43 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.28 seconds
+      cpu time            0.27 seconds
+      
+
+8258       data may9c_bhc25(where=(rank<=25));
+8259         set may9c_dm;
+8260         by date;
+8261         if first.date then rank=1;
+8262         else rank+1;
+8263         retain rank;
+8264       run;
+
+NOTE: There were 136902 observations read from the data set WORK.MAY9C_DM.
+NOTE: The data set WORK.MAY9C_BHC25 has 2300 observations and 44 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.10 seconds
+      cpu time            0.07 seconds
+      
+
+8265       
+8266       *aggregate May9c data;
+8267       /*proc univariate noprint data=may9c_bhc25;
+8268         by date;
+8269         var &rmvars;
+8270         output out=may9c_agg25 sum=&rmvars;
+8271       run;
+8272       
+8273       *eliminate erroneous charge-off rates;
+8274       data may9c_agg25;
+8275         set may9c_agg25;
+8276         %replace_num(0,.);
+8277       run;
+34                               The SAS System  09:43 Thursday, August 22, 2013
+
+8278       */
+8279       /*construct financial variables*/
+8280       /*data may9c_vars;
+8281             set may9c_agg25;
+8282             nonintinc_xtr = sum(nonintinc,-nonintinc_tr);
+8283             nonintexp_xgw = sum(nonintexp,-impair_gw);
+8284             nonintexp_oth =
+8284     ! sum(nonintexp,-nonintexp_comp,-nonintexp_prop,-impair_gw,-impair_oint
+8284     ! );
+8285             ppnr_y9 = 100*sum(netintinc,nonintinc,-nonintexp)/assets_avg;
+8286             ppnr_base =
+8286     ! 100*sum(netintinc,nonintinc,-nonintexp,impair_gw,impair_oint,-inc_ext
+8286     ! ra)/assets_avg;
+8287             ppnr_xtr =
+8287     ! 100*sum(netintinc,nonintinc_xtr,-nonintexp)/assets_avg;
+8288             nonintinc_xtr_ta = 100*nonintinc_xtr/assets_avg;
+8289             nonintinc_tr_ta = 100*nonintinc_tr/assets_avg;
+8290             nonintinc_tr_tra = 100*nonintinc_tr/assets_tr;
+8291             nim_y9 = 100*netintinc/(assets_ie_avg+assets_tr);
+8292             nim_ta = 100*netintinc/assets_avg;
+8293             nonintexp_comp_ta = 100*nonintexp_comp/assets_avg;
+8294             nonintexp_prop_ta = 100*nonintexp_prop/assets_avg;
+8295             nonintexp_oth_ta = 100*nonintexp_oth/assets_avg;
+8296             deps = 100*sum(dep_dom,dep_fgn)/assets_avg;
+8297             payout = sum(dividends,tstock_prchs);
+8298             alll = 100*alll_lvl/loans_avg;
+8299             lllp_y9 = 100*lllp_lvl/loans_avg;
+8300             tier1cr = tier1c/rwa;
+8301             chgoff_y9 = 100*nchg/loans_avg;
+8302             chgoff_ci_y9 = 100*nchg_ci/loans_ci;
+8303             chgoff_cre_y9 =
+8303     ! 100*(sum(nchg_cld,nchg_mfam,nchg_nfnr)/sum(loans_cld,loans_mfam,loans
+8303     ! _nfnr));
+8304             chgoff_cld_y9 = 100*nchg_cld/loans_cld;
+8305             chgoff_mfam_y9 = 100*nchg_mfam/loans_mfam;
+8306             chgoff_nfnr_y9 = 100*nchg_nfnr/loans_nfnr;
+8307             chgoff_heloc_y9 = 100*nchg_heloc/loans_heloc;
+8308             chgoff_sfam_y9 = 100*nchg_sfam/loans_sfam;
+8309             chgoff_sfam_l1_y9 = 100*nchg_sfam_l1/loans_sfam_l1;
+8310             chgoff_sfam_l2_y9 = 100*nchg_sfam_l2/loans_sfam_l2;
+8311             chgoff_cons_y9 = 100*nchg_cons/loans_cons;
+8312             chgoff_cc_y9 = 100*nchg_cc/loans_cc;
+8313             chgoff_consxcc_y9 = 100*nchg_consxcc/loans_consxcc;
+8314             exposure_ci_y9 = 100*loans_ci/assets_ie_avg;
+8315             exposure_cre_y9 =
+8315     ! 100*sum(loans_cld,loans_mfam,loans_nfnr)/assets_ie_avg;
+8316             exposure_rre_y9 =
+8316     ! 100*sum(loans_heloc,loans_sfam_l1,loans_sfam_l2)/assets_ie_avg;
+8317             exposure_cc_y9 = 100*loans_cc/assets_ie_avg;
+8318             exposure_othcons_y9 =
+8318     ! 100*sum(loans_cons,-loans_cc)/assets_ie_avg;
+8319             exposure_tr_y9 = 100*assets_tr/assets_ie_avg;
+8320       
+8321       run;
+8322       */
+8323       
+8324       
+35                               The SAS System  09:43 Thursday, August 22, 2013
+
+8325       /*seasonally adjust series;
+8326       %let svars = ppnr nim netinc_ptax nonintinc_net nonintinc nonintexp
+8327                    nonintinc_xtr nonintinc_tr nonintexp_comp nonintexp_prop
+8327     !  nonintexp_oth
+8328                    tier1r lllp chgoff
+8329                    chgoff_ci chgoff_cre chgoff_cld chgoff_mfam chgoff_nfnr
+8330                    chgoff_rre chgoff_heloc chgoff_sfam chgoff_cc
+8330     ! chgoff_othcons chgoff_oth;
+8331       proc x12 noprint data=tiny_agg25 date=date interval=qtr;
+8332         var &svars;
+8333         x11 mode=add;
+8334         output out=seasonal d11;
+8335       run;
+8336       
+8337       %let svars_nsa = %varsfx(&svars,_nsa);
+8338       data tiny_agg25_sa;
+8339         merge seasonal(rename=(%renamer1(%varsfx(&svars,_D11),&svars)))
+8340               tiny_agg25(rename=(%renamer1(&svars,&svars_nsa)));
+8341         by date;
+8342       run;
+8343       */
+8344       
+8345         *output;
+8346         data nii.may9c_noninterest; set may9c_bhc25; run;
+
+NOTE: There were 2300 observations read from the data set WORK.MAY9C_BHC25.
+NOTE: The data set NII.MAY9C_NONINTEREST has 2300 observations and 44 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.10 seconds
+      cpu time            0.02 seconds
+      
+
+8347         proc export data=may9c_bhc25
+8347     ! outfile="&fpath./may9c_noninterest_nonagg.csv" dbms=csv replace; run;
+8347     !  run;
+
+8348        /*******************************************************************
+8348     ! ***
+8349        *   PRODUCT:   SAS
+8350        *   VERSION:   9.3
+8351        *   CREATOR:   External File Interface
+8352        *   DATE:      22AUG13
+8353        *   DESC:      Generated SAS Datastep Code
+8354        *   TEMPLATE SOURCE:  (None Specified.)
+8355        ********************************************************************
+8355     ! ***/
+8356           data _null_;
+8357           %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+8358           %let _EFIREC_ = 0;     /* clear export record count macro
+8358     ! variable */
+8359           file
+8359     ! '/ofs/prod1/CCAR/noninterest_income/data/may9c_noninterest_nonagg.csv
+8359     ! ' delimiter=',' DSD DROPOVER lrecl=32767;
+8360           if _n_ = 1 then        /* write column names or labels */
+8361            do;
+8362              put
+8363                 "date"
+36                               The SAS System  09:43 Thursday, August 22, 2013
+
+8364              ','
+8365                 "entity"
+8366              ','
+8367                 "assets"
+8368              ','
+8369                 "credit_loss_allowances"
+8370              ','
+8371                 "res_mortgages_open"
+8372              ','
+8373                 "other_adj_equity"
+8374              ','
+8375                 "fiduciary_activities"
+8376              ','
+8377                 "total_nii"
+8378              ','
+8379                 "tr_comm"
+8380              ','
+8381                 "investment_banking_fees"
+8382              ','
+8383                 "FI01650"
+8384              ','
+8385                 "res_mortgages_closed"
+8386              ','
+8387                 "net_servicing_fees"
+8388              ','
+8389                 "insurcance_commissions"
+8390              ','
+8391                 "ng_other_assets"
+8392              ','
+8393                 "net_sec_income"
+8394              ','
+8395                 "ng_other_real_estate"
+8396              ','
+8397                 "rent_other_real_estate"
+8398              ','
+8399                 "total_tr"
+8400              ','
+8401                 "check_printing_fees"
+8402              ','
+8403                 "earnings_life_insurance"
+8404              ','
+8405                 "atm_fees"
+8406              ','
+8407                 "safe_deposit_rent"
+8408              ','
+8409                 "service_charges"
+8410              ','
+8411                 "net_change_fair_value"
+8412              ','
+8413                 "card_interchange_fees"
+8414              ','
+8415                 "vc_rev"
+8416              ','
+8417                 "tr_int_rt_exp"
+8418              ','
+8419                 "tr_foreign_ex"
+8420              ','
+37                               The SAS System  09:43 Thursday, August 22, 2013
+
+8421                 "tr_credit"
+8422              ','
+8423                 "tr_equity"
+8424              ','
+8425                 "ng_sale_loans"
+8426              ','
+8427                 "ng_credit_deriv"
+8428              ','
+8429                 "sale_mutual_funds"
+8430              ','
+8431                 "ng_assets_fv"
+8432              ','
+8433                 "other_nii"
+8434              ','
+8435                 "name"
+8436              ','
+8437                 "rssd9002"
+8438              ','
+8439                 "ID_RSSD"
+8440              ','
+8441                 "D_DT_START"
+8442              ','
+8443                 "D_DT_END"
+8444              ','
+8445                 "NM_SHORT"
+8446              ','
+8447                 "DOMESTIC_IND"
+8448              ','
+8449                 "rank"
+8450              ;
+8451            end;
+8452          set  MAY9C_BHC25   end=EFIEOD;
+8453              format date yyq4. ;
+8454              format entity 11. ;
+8455              format assets comma11. ;
+8456              format credit_loss_allowances comma11. ;
+8457              format res_mortgages_open comma11. ;
+8458              format other_adj_equity comma11. ;
+8459              format fiduciary_activities comma11. ;
+8460              format total_nii comma11. ;
+8461              format tr_comm comma11. ;
+8462              format investment_banking_fees comma11. ;
+8463              format FI01650 comma11. ;
+8464              format res_mortgages_closed comma11. ;
+8465              format net_servicing_fees comma11. ;
+8466              format insurcance_commissions comma11. ;
+8467              format ng_other_assets comma11. ;
+8468              format net_sec_income comma11. ;
+8469              format ng_other_real_estate comma11. ;
+8470              format rent_other_real_estate comma11. ;
+8471              format total_tr comma11. ;
+8472              format check_printing_fees comma11. ;
+8473              format earnings_life_insurance comma11. ;
+8474              format atm_fees comma11. ;
+8475              format safe_deposit_rent comma11. ;
+8476              format service_charges comma11. ;
+8477              format net_change_fair_value comma11. ;
+38                               The SAS System  09:43 Thursday, August 22, 2013
+
+8478              format card_interchange_fees comma11. ;
+8479              format vc_rev comma11. ;
+8480              format tr_int_rt_exp comma11. ;
+8481              format tr_foreign_ex comma11. ;
+8482              format tr_credit comma11. ;
+8483              format tr_equity comma11. ;
+8484              format ng_sale_loans comma11. ;
+8485              format ng_credit_deriv comma11. ;
+8486              format sale_mutual_funds comma11. ;
+8487              format ng_assets_fv comma11. ;
+8488              format other_nii comma11. ;
+8489              format name name30. ;
+8490              format rssd9002 best12. ;
+8491              format ID_RSSD 11. ;
+8492              format D_DT_START date9. ;
+8493              format D_DT_END date9. ;
+8494              format NM_SHORT $30. ;
+8495              format DOMESTIC_IND $1. ;
+8496              format rank best12. ;
+8497            do;
+8498              EFIOUT + 1;
+8499              put date @;
+8500              put entity @;
+8501              put assets @;
+8502              put credit_loss_allowances @;
+8503              put res_mortgages_open @;
+8504              put other_adj_equity @;
+8505              put fiduciary_activities @;
+8506              put total_nii @;
+8507              put tr_comm @;
+8508              put investment_banking_fees @;
+8509              put FI01650 @;
+8510              put res_mortgages_closed @;
+8511              put net_servicing_fees @;
+8512              put insurcance_commissions @;
+8513              put ng_other_assets @;
+8514              put net_sec_income @;
+8515              put ng_other_real_estate @;
+8516              put rent_other_real_estate @;
+8517              put total_tr @;
+8518              put check_printing_fees @;
+8519              put earnings_life_insurance @;
+8520              put atm_fees @;
+8521              put safe_deposit_rent @;
+8522              put service_charges @;
+8523              put net_change_fair_value @;
+8524              put card_interchange_fees @;
+8525              put vc_rev @;
+8526              put tr_int_rt_exp @;
+8527              put tr_foreign_ex @;
+8528              put tr_credit @;
+8529              put tr_equity @;
+8530              put ng_sale_loans @;
+8531              put ng_credit_deriv @;
+8532              put sale_mutual_funds @;
+8533              put ng_assets_fv @;
+8534              put other_nii @;
+39                               The SAS System  09:43 Thursday, August 22, 2013
+
+8535              put name @;
+8536              put rssd9002 @;
+8537              put ID_RSSD @;
+8538              put D_DT_START @;
+8539              put D_DT_END @;
+8540              put NM_SHORT $ @;
+8541              put DOMESTIC_IND $ @;
+8542              put rank ;
+8543              ;
+8544            end;
+8545           if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR
+8545     ! detection macro variable */
+8546           if EFIEOD then call symputx('_EFIREC_',EFIOUT);
+8547           run;
+
+NOTE: The file 
+      '/ofs/prod1/CCAR/noninterest_income/data/may9c_noninterest_nonagg.csv' is:
+      
+      Filename=/ofs/prod1/CCAR/noninterest_income/data/may9c_noninterest_nonagg.
+      csv,
+      Owner Name=m1reb02,Group Name=ofs,
+      Access Permission=rw-rw-r--,
+      Last Modified=Thu Aug 22 09:45:46 2013
+
+NOTE: 2301 records were written to the file 
+      '/ofs/prod1/CCAR/noninterest_income/data/may9c_noninterest_nonagg.csv'.
+      The minimum record length was 154.
+      The maximum record length was 621.
+NOTE: There were 2300 observations read from the data set WORK.MAY9C_BHC25.
+NOTE: DATA statement used (Total process time):
+      real time           0.05 seconds
+      cpu time            0.04 seconds
+      
+
+2300 records created in 
+/ofs/prod1/CCAR/noninterest_income/data/may9c_noninterest_nonagg.csv from 
+MAY9C_BHC25.
+  
+  
+NOTE: "/ofs/prod1/CCAR/noninterest_income/data/may9c_noninterest_nonagg.csv" 
+      file was successfully created.
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.47 seconds
+      cpu time            0.11 seconds
+      
+
+8548       
+8549       endsas;
+
+NOTE: SAS Institute Inc., SAS Campus Drive, Cary, NC USA 27513-2414
+NOTE: The SAS System used:
+      real time           1:56.57
+      cpu time            10.37 seconds
+      

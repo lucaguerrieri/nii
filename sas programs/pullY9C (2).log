@@ -1,0 +1,2315 @@
+1                                The SAS System      11:48 Monday, March 4, 2013
+
+NOTE: Copyright (c) 2002-2010 by SAS Institute Inc., Cary, NC, USA. 
+NOTE: SAS (r) Proprietary Software 9.3 (TS1M1) 
+      Licensed to FEDERAL RESERVE BOARD OF GOVERNORS, Site 70116210.
+NOTE: This session is executing on the Linux 2.6.18-348.1.1.el5 (LIN X64) 
+      platform.
+
+
+
+NOTE: Updated analytical products:
+
+SAS/STAT 9.3_M1, SAS/ETS 9.3_M1
+
+Welcome to Linux SAS Version 9.3, which was put into production on
+October 31, 2012.
+
+Please direct questions to the Board's SAS Consulting Group (extension 
+2500, sas@frb.gov) or the ARC Section at extension 3700.
+
+--------------------------------------------------------------
+Obtaining assistance from the Board's SAS Consulting Group:
+SAS Consulting Group Hotline: ext 2500 (202-452-2500) M-F 8AM-630PM
+E-mail addresses:       Notes mail shortcut: "SAS Consulting Group"
+                        otherwise:           "sas@frb.gov"
+SAS Consulting Group FedWeb home page:
+           http://fedweb.frb.gov/fedweb/board/irm/sas/index.htm
+--------------------------------------------------------------
+
+
+NOTE: SAS initialization used:
+      real time           5.36 seconds
+      cpu time            0.09 seconds
+      
+
+NOTE: AUTOEXEC processing beginning; file is 
+      /sftwr/sas/9.3/SASFoundation/9.3/autoexec.sas.
+
+NOTE: Libref FRBFORMS was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /sftwr/sas/9.3/SASFoundation/9.3/sasforms
+
+NOTE: AUTOEXEC processing completed.
+
+1          /*******************************************************************
+2          Author: Rachel Boenigk (m1reb02)
+3          Date: March 04, 2013
+4          Purpose: Pull Merger adjusted Y-9C (May9C) data from Banking Analysis
+5          Output: may9c_matchange.sas7bdat
+6          
+7          NOTE: nonintinc_tr_tra == the return on trading assets. You might see
+7        !  this
+8          labeled as return_tradingassets in other spreadsheets.
+9          ********************************************************************/
+10         
+11         
+12         %include './Include/library';
+NOTE: Libref TINY was successfully assigned as follows: 
+      Engine:        V9 
+2                                The SAS System      11:48 Monday, March 4, 2013
+
+      Physical Name: /bks/proj/cbp/sas/data/tiny/tinyprod
+NOTE: Libname TINY90 refers to the same physical library as TINY.
+NOTE: Libref TINY90 was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /bks/proj/cbp/sas/data/tiny/tinyprod
+NOTE: Libname TINY80 refers to the same physical library as TINY90.
+NOTE: Libref TINY80 was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /bks/proj/cbp/sas/data/tiny/tinyprod
+NOTE: Libref MAY9 was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /bks/proj/cbp/sas/data/may9
+NOTE: Libref LIBRARY was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /bks/proj/cbp/sas/data/library
+NOTE: Libref NIC was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /rsma/microdata/nicua
+19         %include './Include/bcrmacros.sas';
+1730       %include './Include/PDMACRO.sas';
+4011       %include './Include/setmay9.sas';
+5654       %include './Include/settiny.sas';
+8903       
+8904       libname out '/ofs/prod1/CCAR/material_change/data';
+NOTE: Libref OUT was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /ofs/prod1/CCAR/material_change/data
+8905       
+8906       options sasautos=('/bks/proj/cbp/sas/pgms/tiny/macros',
+8907                         '/bks/proj/cbp/sas/pgms/uniform/macros',
+8908                         '!SASROOT/sasautos',
+8909                         '!SASROOT/frbmac');
+8910       
+8911       
+8912       
+8913       %let fpath = /ofs/prod1/CCAR/noninterest_income/data;
+8914       libname ccar2011 "&fpath";
+NOTE: Libref CCAR2011 was successfully assigned as follows: 
+      Engine:        V9 
+      Physical Name: /ofs/prod1/CCAR/noninterest_income/data
+8915       
+8916       %let sdate = 1997q1;
+8917       %let edate = 2013q1;
+8918       *retrieve MAY9 data;
+8919       %let mvars = bc01000 bck0450 bck0470 ac00600
+8920                    bc01950 bcr0400 acr0400 bcr0410 bcr4175
+8921                    fi01150 fi02000 fi02400 fi01350
+8922                    ac00500 fi01200
+8923                    fia0500 fia0590
+8924       	     fi02250 fi02300 fi02600
+8925       	     fi02150 fi02200
+8926                    ac01100 ac01200
+8927       	     bcc1800 bck0140
+8928                    acc0850 acc0075 acc0400 acc0425
+8929                    acc0250 acc0275 acc0300 acc0350
+8930                    acc0975 acc1000 acc1025
+8931                    fib2210
+3                                The SAS System      11:48 Monday, March 4, 2013
+
+8932                    fib1345 fib0045 fib0725 fib0745
+8933       	     fib0425 fib0445 fib0525 fib0625
+8934       	     fib1540 fib1601 fib1607
+8935                    ;
+8936       
+8937       %let rmvars = assets assets_avg assets_ie_avg assets_tr
+8938                     equity tier1 tier1_avg tier1c rwa
+8939                     netintinc nonintinc nonintexp nonintinc_tr
+8940                     alll_lvl lllp_lvl
+8941                     tstock_prchs dividends
+8942       	      impair_gw impair_oint inc_extra
+8943       	      nonintexp_comp nonintexp_prop
+8944                     dep_dom dep_fgn
+8945                     loans loans_avg
+8946                     loans_ci loans_cld loans_mfam loans_nfnr
+8947                     loans_heloc loans_sfam loans_sfam_l1 loans_sfam_l2
+8948                     loans_cons loans_cc loans_consxcc
+8949                     nchg
+8950                     nchg_ci nchg_cld nchg_mfam nchg_nfnr
+8951       	      nchg_heloc nchg_sfam nchg_sfam_l1 nchg_sfam_l2
+8952       	      nchg_cons nchg_cc nchg_consxcc
+8953                     ;
+8954       
+8955       %setmay9(dates=%dateseq(&sdate,&edate),tsindex=date,kvars=&mvars,outd
+8955     ! s=may9_raw);
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: SAS set option OBS=0 and will continue to check statements. 
+      This might cause NOTE: No observations in data set.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.19 seconds
+      cpu time            0.02 seconds
+      
+
+
+
+NOTE: The data set WORK.MAY9_RAW has 0 observations and 53 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+4                                The SAS System      11:48 Monday, March 4, 2013
+
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.16 seconds
+      cpu time            0.04 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+5                                The SAS System      11:48 Monday, March 4, 2013
+
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.02 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.02 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.01 seconds
+      
+
+
+6                                The SAS System      11:48 Monday, March 4, 2013
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+7                                The SAS System      11:48 Monday, March 4, 2013
+
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+8                                The SAS System      11:48 Monday, March 4, 2013
+
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+9                                The SAS System      11:48 Monday, March 4, 2013
+
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+10                               The SAS System      11:48 Monday, March 4, 2013
+
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+11                               The SAS System      11:48 Monday, March 4, 2013
+
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+12                               The SAS System      11:48 Monday, March 4, 2013
+
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.02 seconds
+      
+
+13                               The SAS System      11:48 Monday, March 4, 2013
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+14                               The SAS System      11:48 Monday, March 4, 2013
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+15                               The SAS System      11:48 Monday, March 4, 2013
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.03 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+16                               The SAS System      11:48 Monday, March 4, 2013
+
+      real time           0.03 seconds
+      cpu time            0.02 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.17 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.02 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+17                               The SAS System      11:48 Monday, March 4, 2013
+
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+18                               The SAS System      11:48 Monday, March 4, 2013
+
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.00 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.02 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+19                               The SAS System      11:48 Monday, March 4, 2013
+
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.14 seconds
+      cpu time            0.11 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.02 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+20                               The SAS System      11:48 Monday, March 4, 2013
+
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.02 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.02 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+21                               The SAS System      11:48 Monday, March 4, 2013
+
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+22                               The SAS System      11:48 Monday, March 4, 2013
+
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.02 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+23                               The SAS System      11:48 Monday, March 4, 2013
+
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+24                               The SAS System      11:48 Monday, March 4, 2013
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.02 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+25                               The SAS System      11:48 Monday, March 4, 2013
+
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+26                               The SAS System      11:48 Monday, March 4, 2013
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.02 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.01 seconds
+27                               The SAS System      11:48 Monday, March 4, 2013
+
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.02 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+28                               The SAS System      11:48 Monday, March 4, 2013
+
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.02 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+29                               The SAS System      11:48 Monday, March 4, 2013
+
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+30                               The SAS System      11:48 Monday, March 4, 2013
+
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.02 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.02 seconds
+      
+
+
+31                               The SAS System      11:48 Monday, March 4, 2013
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 53 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+ERROR: File MAY9.MAY91303.DATA does not exist.
+NOTE: Line generated by the invoked macro "SETMAY9".
+8955        name.;            name=entity;
+            _____
+            48
+ERROR: File LIBRARY.FORMATS.CATALOG was created for a different operating 
+       system.
+
+ERROR 48-59: The format NAME was not found or could not be loaded.
+
+WARNING: The variable rssd9002 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable bc01000 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable bck0450 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable bck0470 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable ac00600 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable bc01950 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable bcr0400 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable acr0400 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+32                               The SAS System      11:48 Monday, March 4, 2013
+
+WARNING: The variable bcr0410 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable bcr4175 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fi01150 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fi02000 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fi02400 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fi01350 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable ac00500 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fi01200 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fia0500 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fia0590 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fi02250 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fi02300 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fi02600 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fi02150 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fi02200 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable ac01100 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable ac01200 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable bcc1800 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable bck0140 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable acc0850 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable acc0075 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable acc0400 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable acc0425 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable acc0250 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable acc0275 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable acc0300 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable acc0350 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable acc0975 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable acc1000 in the DROP, KEEP, or RENAME list has never been 
+33                               The SAS System      11:48 Monday, March 4, 2013
+
+         referenced.
+WARNING: The variable acc1025 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fib2210 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fib1345 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fib0045 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fib0725 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fib0745 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fib0425 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fib0445 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fib0525 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fib0625 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fib1540 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fib1601 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+WARNING: The variable fib1607 in the DROP, KEEP, or RENAME list has never been 
+         referenced.
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.BIGG may be incomplete.  When this step was stopped 
+         there were 0 observations and 3 variables.
+WARNING: Data set WORK.BIGG was not replaced because this step was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+
+NOTE: PROCEDURE APPEND used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+8956       data may9; set may9_raw(rename=(%renamer1(&mvars,&rmvars))); run;
+
+NOTE: The data set WORK.MAY9 has 0 observations and 53 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.02 seconds
+      cpu time            0.03 seconds
+      
+
+8957       proc sort data=may9; by entity date; run;
+
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+34                               The SAS System      11:48 Monday, March 4, 2013
+
+
+8958       
+8959        *keep only domestic banks;
+8960       data attr;
+8961            set nic.attr(keep=id_rssd d_dt_start d_dt_end domestic_ind
+8961     ! nm_short);
+ERROR: User does not have appropriate authorization level for file 
+       NIC.ATTR.DATA.
+8962       run;
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.ATTR may be incomplete.  When this step was stopped 
+         there were 0 observations and 0 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+8963       
+8964       proc sql;
+8965         create table may9c_dm as
+8966         select t.*, a.*
+8967         from may9 t left join attr a on (t.entity=a.id_rssd)
+8968         where (d_dt_start <= date <= d_dt_end and domestic_ind="Y");
+ERROR: Table WORK.ATTR doesn't have any columns. PROC SQL requires each of its 
+       tables to have at least 1 column.
+ERROR: Column id_rssd could not be found in the table/view identified with the 
+       correlation name A.
+ERROR: Column id_rssd could not be found in the table/view identified with the 
+       correlation name A.
+ERROR: Expression using equals (=) has components that are of different data 
+       types.
+ERROR: Expression using less than or equal (<=) has components that are of 
+       different data types.
+ERROR: The following columns were not found in the contributing tables: 
+       domestic_ind, d_dt_end, d_dt_start.
+NOTE: PROC SQL set option NOEXEC and will continue to check the syntax of 
+      statements.
+8969       quit;
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SQL used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+8970       
+8971       
+8972       *keep only top 25 BHCs;
+
+
+8973       proc sort data=may9c_dm; by date descending assets; run;
+ERROR: File WORK.MAY9C_DM.DATA does not exist.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+
+NOTE: The SAS System stopped processing this step because of errors.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+35                               The SAS System      11:48 Monday, March 4, 2013
+
+      cpu time            0.00 seconds
+      
+
+
+8974       data may9c_bhc25(where=(rank<=25));
+8975         set may9c_dm;
+ERROR: File WORK.MAY9C_DM.DATA does not exist.
+8976         by date;
+8977         if first.date then rank=1;
+8978         else rank+1;
+8979         retain rank;
+8980       run;
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.MAY9C_BHC25 may be incomplete.  When this step was 
+         stopped there were 0 observations and 1 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+8981       
+8982       *aggregate May9c data;
+8983       proc univariate noprint data=may9c_bhc25;
+8984         by date;
+ERROR: Variable DATE not found.
+8985         var &rmvars;
+ERROR: Variable ASSETS not found.
+ERROR: Variable ASSETS_AVG not found.
+ERROR: Variable ASSETS_IE_AVG not found.
+ERROR: Variable ASSETS_TR not found.
+ERROR: Variable EQUITY not found.
+ERROR: Variable TIER1 not found.
+ERROR: Variable TIER1_AVG not found.
+ERROR: Variable TIER1C not found.
+ERROR: Variable RWA not found.
+ERROR: Variable NETINTINC not found.
+ERROR: Variable NONINTINC not found.
+ERROR: Variable NONINTEXP not found.
+ERROR: Variable NONINTINC_TR not found.
+ERROR: Variable ALLL_LVL not found.
+ERROR: Variable LLLP_LVL not found.
+ERROR: Variable TSTOCK_PRCHS not found.
+ERROR: Variable DIVIDENDS not found.
+ERROR: Variable IMPAIR_GW not found.
+ERROR: Variable IMPAIR_OINT not found.
+ERROR: Variable INC_EXTRA not found.
+ERROR: Variable NONINTEXP_COMP not found.
+ERROR: Variable NONINTEXP_PROP not found.
+ERROR: Variable DEP_DOM not found.
+ERROR: Variable DEP_FGN not found.
+ERROR: Variable LOANS not found.
+ERROR: Variable LOANS_AVG not found.
+ERROR: Variable LOANS_CI not found.
+ERROR: Variable LOANS_CLD not found.
+ERROR: Variable LOANS_MFAM not found.
+ERROR: Variable LOANS_NFNR not found.
+36                               The SAS System      11:48 Monday, March 4, 2013
+
+ERROR: Variable LOANS_HELOC not found.
+ERROR: Variable LOANS_SFAM not found.
+ERROR: Variable LOANS_SFAM_L1 not found.
+ERROR: Variable LOANS_SFAM_L2 not found.
+ERROR: Variable LOANS_CONS not found.
+ERROR: Variable LOANS_CC not found.
+ERROR: Variable LOANS_CONSXCC not found.
+ERROR: Variable NCHG not found.
+ERROR: Variable NCHG_CI not found.
+ERROR: Variable NCHG_CLD not found.
+ERROR: Variable NCHG_MFAM not found.
+ERROR: Variable NCHG_NFNR not found.
+ERROR: Variable NCHG_HELOC not found.
+ERROR: Variable NCHG_SFAM not found.
+ERROR: Variable NCHG_SFAM_L1 not found.
+ERROR: Variable NCHG_SFAM_L2 not found.
+ERROR: Variable NCHG_CONS not found.
+ERROR: Variable NCHG_CC not found.
+ERROR: Variable NCHG_CONSXCC not found.
+8986         output out=may9c_agg25 sum=&rmvars;
+8987       run;
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.MAY9C_AGG25 may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE UNIVARIATE used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+8988       
+8989       *eliminate erroneous charge-off rates;
+
+
+8990       data may9c_agg25;
+8991         set may9c_agg25;
+8992         %replace_num(0,.);
+WARNING: Defining an array with zero elements.
+8993       run;
+
+NOTE: The data set WORK.MAY9C_AGG25 has 0 observations and 0 variables.
+WARNING: Data set WORK.MAY9C_AGG25 was not replaced because this step was 
+         stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+8994       /*construct financial variables*/
+8995       data may9c_vars;
+8996             set may9c_agg25;
+8997             nonintinc_xtr = sum(nonintinc,-nonintinc_tr);
+8998             nonintexp_xgw = sum(nonintexp,-impair_gw);
+8999             nonintexp_oth =
+8999     ! sum(nonintexp,-nonintexp_comp,-nonintexp_prop,-impair_gw,-impair_oint
+8999     ! );
+9000             ppnr_y9 = 100*sum(netintinc,nonintinc,-nonintexp)/assets_avg;
+9001             ppnr_base =
+37                               The SAS System      11:48 Monday, March 4, 2013
+
+9001     ! 100*sum(netintinc,nonintinc,-nonintexp,impair_gw,impair_oint,-inc_ext
+9001     ! ra)/assets_avg;
+9002             ppnr_xtr =
+9002     ! 100*sum(netintinc,nonintinc_xtr,-nonintexp)/assets_avg;
+9003             nonintinc_xtr_ta = 100*nonintinc_xtr/assets_avg;
+9004             nonintinc_tr_ta = 100*nonintinc_tr/assets_avg;
+9005             nonintinc_tr_tra = 100*nonintinc_tr/assets_tr;
+9006             nim_y9 = 100*netintinc/(assets_ie_avg+assets_tr);
+9007             nim_ta = 100*netintinc/assets_avg;
+9008             nonintexp_comp_ta = 100*nonintexp_comp/assets_avg;
+9009             nonintexp_prop_ta = 100*nonintexp_prop/assets_avg;
+9010             nonintexp_oth_ta = 100*nonintexp_oth/assets_avg;
+9011             deps = 100*sum(dep_dom,dep_fgn)/assets_avg;
+9012             payout = sum(dividends,tstock_prchs);
+9013             alll = 100*alll_lvl/loans_avg;
+9014             lllp_y9 = 100*lllp_lvl/loans_avg;
+9015             tier1cr = tier1c/rwa;
+9016             chgoff_y9 = 100*nchg/loans_avg;
+9017             chgoff_ci_y9 = 100*nchg_ci/loans_ci;
+9018             chgoff_cre_y9 =
+9018     ! 100*(sum(nchg_cld,nchg_mfam,nchg_nfnr)/sum(loans_cld,loans_mfam,loans
+9018     ! _nfnr));
+9019             chgoff_cld_y9 = 100*nchg_cld/loans_cld;
+9020             chgoff_mfam_y9 = 100*nchg_mfam/loans_mfam;
+9021             chgoff_nfnr_y9 = 100*nchg_nfnr/loans_nfnr;
+9022             chgoff_heloc_y9 = 100*nchg_heloc/loans_heloc;
+9023             chgoff_sfam_y9 = 100*nchg_sfam/loans_sfam;
+9024             chgoff_sfam_l1_y9 = 100*nchg_sfam_l1/loans_sfam_l1;
+9025             chgoff_sfam_l2_y9 = 100*nchg_sfam_l2/loans_sfam_l2;
+9026             chgoff_cons_y9 = 100*nchg_cons/loans_cons;
+9027             chgoff_cc_y9 = 100*nchg_cc/loans_cc;
+9028             chgoff_consxcc_y9 = 100*nchg_consxcc/loans_consxcc;
+9029             exposure_ci_y9 = 100*loans_ci/assets_ie_avg;
+9030             exposure_cre_y9 =
+9030     ! 100*sum(loans_cld,loans_mfam,loans_nfnr)/assets_ie_avg;
+9031             exposure_rre_y9 =
+9031     ! 100*sum(loans_heloc,loans_sfam_l1,loans_sfam_l2)/assets_ie_avg;
+9032             exposure_cc_y9 = 100*loans_cc/assets_ie_avg;
+9033             exposure_othcons_y9 =
+9033     ! 100*sum(loans_cons,-loans_cc)/assets_ie_avg;
+9034             exposure_tr_y9 = 100*assets_tr/assets_ie_avg;
+9035       
+9036       run;
+
+NOTE: The data set WORK.MAY9C_VARS has 0 observations and 82 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+9037       
+9038       
+9039       
+9040       seasonally adjust series;
+           __________
+           180
+
+38                               The SAS System      11:48 Monday, March 4, 2013
+
+ERROR 180-322: Statement is not valid or it is used out of proper order.
+
+9041       %let svars = ppnr nim netinc_ptax nonintinc_net nonintinc nonintexp
+9042                    nonintinc_xtr nonintinc_tr nonintexp_comp nonintexp_prop
+9042     !  nonintexp_oth
+9043                    tier1r lllp chgoff
+9044                    chgoff_ci chgoff_cre chgoff_cld chgoff_mfam chgoff_nfnr
+9045                    chgoff_rre chgoff_heloc chgoff_sfam chgoff_cc
+9045     ! chgoff_othcons chgoff_oth;
+9046       proc x12 noprint data=tiny_agg25 date=date interval=qtr;
+ERROR: File WORK.TINY_AGG25.DATA does not exist.
+9047         var &svars;
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+ERROR: No data set open to look up variables.
+9048         x11 mode=add;
+9049         output out=seasonal d11;
+9050       run;
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.SEASONAL may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: PROCEDURE X12 used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+9051       
+9052       %let svars_nsa = %varsfx(&svars,_nsa);
+
+
+9053       data tiny_agg25_sa;
+9054         merge seasonal(rename=(%renamer1(%varsfx(&svars,_D11),&svars)))
+9055               tiny_agg25(rename=(%renamer1(&svars,&svars_nsa)));
+ERROR: Variable ppnr_D11 is not on file WORK.SEASONAL.
+ERROR: Variable nim_D11 is not on file WORK.SEASONAL.
+39                               The SAS System      11:48 Monday, March 4, 2013
+
+ERROR: Variable netinc_ptax_D11 is not on file WORK.SEASONAL.
+ERROR: Variable nonintinc_net_D11 is not on file WORK.SEASONAL.
+ERROR: Variable nonintinc_D11 is not on file WORK.SEASONAL.
+ERROR: Variable nonintexp_D11 is not on file WORK.SEASONAL.
+ERROR: Variable nonintinc_xtr_D11 is not on file WORK.SEASONAL.
+ERROR: Variable nonintinc_tr_D11 is not on file WORK.SEASONAL.
+ERROR: Variable nonintexp_comp_D11 is not on file WORK.SEASONAL.
+ERROR: Variable nonintexp_prop_D11 is not on file WORK.SEASONAL.
+ERROR: Variable nonintexp_oth_D11 is not on file WORK.SEASONAL.
+ERROR: Variable tier1r_D11 is not on file WORK.SEASONAL.
+ERROR: Variable lllp_D11 is not on file WORK.SEASONAL.
+ERROR: Variable chgoff_D11 is not on file WORK.SEASONAL.
+ERROR: Variable chgoff_ci_D11 is not on file WORK.SEASONAL.
+ERROR: Variable chgoff_cre_D11 is not on file WORK.SEASONAL.
+ERROR: Variable chgoff_cld_D11 is not on file WORK.SEASONAL.
+ERROR: Variable chgoff_mfam_D11 is not on file WORK.SEASONAL.
+ERROR: Variable chgoff_nfnr_D11 is not on file WORK.SEASONAL.
+ERROR: Variable chgoff_rre_D11 is not on file WORK.SEASONAL.
+ERROR: Variable chgoff_heloc_D11 is not on file WORK.SEASONAL.
+ERROR: Variable chgoff_sfam_D11 is not on file WORK.SEASONAL.
+ERROR: Variable chgoff_cc_D11 is not on file WORK.SEASONAL.
+ERROR: Variable chgoff_othcons_D11 is not on file WORK.SEASONAL.
+ERROR: Variable chgoff_oth_D11 is not on file WORK.SEASONAL.
+ERROR: Invalid DROP, KEEP, or RENAME option on file WORK.SEASONAL.
+ERROR: File WORK.TINY_AGG25.DATA does not exist.
+9056         by date;
+9057       run;
+
+NOTE: The SAS System stopped processing this step because of errors.
+WARNING: The data set WORK.TINY_AGG25_SA may be incomplete.  When this step was 
+         stopped there were 0 observations and 0 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.03 seconds
+      
+
+9058       
+9059       
+9060       
+9061         *output;
+9062         data ccar2011.may9c_matchange; set may9c_vars; run;
+
+NOTE: The data set CCAR2011.MAY9C_MATCHANGE has 0 observations and 82 variables.
+WARNING: Data set CCAR2011.MAY9C_MATCHANGE was not replaced because this step 
+         was stopped.
+NOTE: DATA statement used (Total process time):
+      real time           0.02 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: PROCEDURE EXPORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+9063         proc export data=may9c_vars outfile="&fpath./may9c_matchange.csv"
+9063     ! dbms=csv replace; run;
+
+40                               The SAS System      11:48 Monday, March 4, 2013
+
+9064       
+9065       endsas;
+
+ERROR: Errors printed on pages 3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
+                               21,22,23,24,25,26,27,28,29,30,31,34,35,36,37,38,
+                               39,40.
+
+NOTE: SAS Institute Inc., SAS Campus Drive, Cary, NC USA 27513-2414
+NOTE: The SAS System used:
+      real time           11.08 seconds
+      cpu time            1.53 seconds
+      

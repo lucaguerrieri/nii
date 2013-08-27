@@ -1,0 +1,103 @@
+-- Export FAME data directly to CSV!
+-- Author: Rachel Boenigk (m1reb02)
+
+
+over on
+CLOSE ALL
+
+--// Step 1 of 7: Set frequency and date of your series ( default = quarterly )
+FREQ q
+DATE 1990 to 2013 
+
+--// Step 2 of 7: format the output csv file
+ 
+IMAGE DATE "<M>/<D>/<YEAR>" -- // This sets the date format in your output file as MM/DD/YYYY
+--IMAGE DATE "<YEAR>Q<P>"   -- // this is another option. It has the output as 2010Q1
+
+DECIMAL 4
+
+
+--// Step 2 of 7 continuted: OUTPUT filename
+new / my_outfile = "/ofs/prod1/CCAR/noninterest_income/data/famepull2q.csv"
+new / my_temp_file = work'my_outfile + "__temp" -- // don't need to edit this
+
+
+--// Step 3 of 7: Open FAME databases - You can have multiple open!
+
+$open eqissret
+
+
+--// Step 4 of 7: List of series (Business Daily Series)
+
+item class off, series on
+ignore function on -- This command has FAME ignore any missing values when making calculations
+
+-- Here you list the new names for the series and their names as you would find them in their databases
+priv.nvc.ewma = priv.nvc.ewma.q
+priv.nvc.pea = priv.nvc.pea.q
+priv.place.fin.lp.sdc = priv.place.fin.lp.sdc.q
+priv.place.fin.sdc = priv.place.fin.sdc.q
+priv.place.nf.sdc = priv.place.nf.sdc.q
+priv.total = priv.total.q
+priv.vc.pwc = priv.vc.pwc.q
+merg.ann.dom.cash = merg.ann.dom.cash.q
+merg.comp.dom.cash = merg.comp.dom.cash.q
+merg.comp.dom.liab = merg.comp.dom.liab.q
+merg.comp.dom.stock = merg.comp.dom.stock.q
+merg.comp.for.cash = merg.comp.for.cash.q
+merg.comp.for.liab = merg.comp.for.liab.q
+merg.comp.for = merg.comp.for.q
+merg.comp.for.stock = merg.comp.for.stock.q
+
+
+
+
+--Create a list of all variables to export. You must list all of your new series names seperated by commas.
+new / my_list = {priv.nvc.ewma, priv.nvc.pea, priv.place.fin.lp.sdc, priv.place.fin.sdc, priv.place.nf.sdc, priv.total, priv.vc.pwc, merg.ann.dom.cash, merg.comp.dom.cash, merg.comp.dom.liab, merg.comp.dom.stock, merg.comp.for.cash, merg.comp.for.liab, merg.comp.for, merg.comp.for.stock}
+
+
+---------------------------------------------------------------
+----//Step 5 of 7: Routine for sending fame data to csv file format. Nothing here on needs to be changed unless you want your data displayed horizontally instead of vertically 
+---------------------------------------------------------------
+$prnsetup
+
+--// orientation of the csv file
+--$orientation horizontal	-- dates across the top, series down
+$orientation vertical	   -- date in the first coluwn, series across the top
+$format fame
+$precision on
+$quotes on
+$fill lotus
+$prnwidth 3072 --         -- for wide data increase this 
+
+$delimiter COMMA
+
+
+-- ......................................................................... --
+
+type ""
+type "       ...... Creating data for my_list  ........"
+type ""
+type "          DATE: ", firstdate, " to ", lastdate
+type " "
+
+-- ......................................................................... --
+
+type "         >> Working on " + name(list)
+type " "
+
+exec "$pout  work'my_list, " + """" +  work'my_temp_file + """"
+
+--// 6 of 7: List of series
+system("cat " + work'my_temp_file + " | tr -d ' ' > " + work'my_outfile + "; \rm -f " + work'my_temp_file )
+system("unix2dos " + work'my_outfile)   -- // convert 
+
+
+--//
+--// 7 of 7: Inform user of output filename
+type "   OUTPUT FILE: " + work'my_outfile + "  Created .."
+
+
+
+close all;
+exit;
