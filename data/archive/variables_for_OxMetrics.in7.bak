@@ -1,0 +1,173 @@
+pcgive 700
+data variables_for_OxMetrics.bn7
+>Svar1           1  1   97  1  1 32 variables_fo 01-04-2013 16:00:33 choice[93]
+|date|90Q1|90Q2|90Q3|90Q4|91Q1|91Q2|91Q3|91Q4|92Q1|92Q2|92Q3|92Q4|93Q1|93Q2|93Q3|93Q4|94Q1|94Q2|94Q3|94Q4|95Q1|95Q2|95Q3|95Q4|96Q1|96Q2|96Q3|96Q4|97Q1|97Q2|97Q3|97Q4
+|98Q1|98Q2|98Q3|98Q4|99Q1|99Q2|99Q3|99Q4|00Q1|00Q2|00Q3|00Q4|01Q1|01Q2|01Q3|01Q4|02Q1|02Q2|02Q3|02Q4|03Q1|03Q2|03Q3|03Q4|04Q1|04Q2|04Q3|04Q4|05Q1|05Q2|05Q3|05Q4|06Q1
+|06Q2|06Q3|06Q4|07Q1|07Q2|07Q3|07Q4|08Q1|08Q2|08Q3|08Q4|09Q1|09Q2|09Q3|09Q4|10Q1|10Q2|10Q3|10Q4|11Q1|11Q2|11Q3|11Q4|12Q1|12Q2|12Q3|12Q4
+>Svar2           1  1   97  1  1 840 variables_fo 01-04-2013 16:00:33 choice[1]
+|assets
+>Svar3           1  1   97  1  1 1648 variables_fo 01-04-2013 16:00:33 choice[1]
+|total_nii
+>Svar4           1  1   97  1  1 2456 variables_fo 01-04-2013 16:00:33 choice[1]
+|normalized_nii
+>Svar5           1  1   97  1  1 3264 variables_fo 01-04-2013 16:00:33 choice[1]
+|credit_loss_allowances
+>Svar6           1  1   97  1  1 4072 variables_fo 01-04-2013 16:00:33 choice[1]
+|card_interchange_fees
+>Svar7           1  1   97  1  1 4880 variables_fo 01-04-2013 16:00:33 choice[1]
+|earnings_life_insurance
+>Svar8           1  1   97  1  1 5688 variables_fo 01-04-2013 16:00:33 choice[1]
+|atm_fees
+>Svar9           1  1   97  1  1 6496 variables_fo 01-04-2013 16:00:33 choice[1]
+|check_printing_fees
+>Svar10          1  1   97  1  1 7304 variables_fo 01-04-2013 16:00:33 choice[1]
+|fiduciary_activities
+>Svar11          1  1   97  1  1 8112 variables_fo 01-04-2013 16:00:33 choice[1]
+|sale_mutual_funds
+>Svar12          1  1   97  1  1 8920 variables_fo 01-04-2013 16:00:33 choice[1]
+|insurcance_commissions
+>Svar13          1  1   97  1  1 9728 variables_fo 01-04-2013 16:00:33 choice[1]
+|investment_banking_fees
+>Svar14          1  1   97  1  1 10536 variables_fo 01-04-2013 16:00:33 choice[1]
+|net_change_fair_value
+>Svar15          1  1   97  1  1 11344 variables_fo 01-04-2013 16:00:33 choice[1]
+|ng_assets_fv
+>Svar16          1  1   97  1  1 12152 variables_fo 01-04-2013 16:00:33 choice[1]
+|ng_credit_deriv
+>Svar17          1  1   97  1  1 12960 variables_fo 01-04-2013 16:00:33 choice[1]
+|ng_sale_loans
+>Svar18          1  1   97  1  1 13768 variables_fo 01-04-2013 16:00:33 choice[1]
+|ng_other_assets
+>Svar19          1  1   97  1  1 14576 variables_fo 01-04-2013 16:00:33 choice[1]
+|ng_other_real_estate
+>Svar20          1  1   97  1  1 15384 variables_fo 01-04-2013 16:00:33 choice[1]
+|net_sec_income
+>Svar21          1  1   97  1  1 16192 variables_fo 01-04-2013 16:00:33 choice[1]
+|net_servicing_fees
+>Svar22          1  1   97  1  1 17000 variables_fo 01-04-2013 16:00:33 choice[1]
+|res_mortgages_closed
+>Svar23          1  1   97  1  1 17808 variables_fo 01-04-2013 16:00:33 choice[1]
+|res_mortgages_open
+>Svar24          1  1   97  1  1 18616 variables_fo 01-04-2013 16:00:33 choice[1]
+|other_adj_equity
+>Svar25          1  1   97  1  1 19424 variables_fo 01-04-2013 16:00:33 choice[1]
+|other_nii
+>Svar26          1  1   97  1  1 20232 variables_fo 01-04-2013 16:00:33 choice[1]
+|rent_other_real_estate
+>Svar27          1  1   97  1  1 21040 variables_fo 01-04-2013 16:00:33 choice[1]
+|safe_deposit_rent
+>Svar28          1  1   97  1  1 21848 variables_fo 01-04-2013 16:00:33 choice[1]
+|service_charges
+>Svar29          1  1   97  1  1 22656 variables_fo 01-04-2013 16:00:33 choice[1]
+|total_nii
+>Svar30          1  1   97  1  1 23464 variables_fo 01-04-2013 16:00:33 choice[1]
+|total_tr
+>Svar31          1  1   97  1  1 24272 variables_fo 01-04-2013 16:00:33 choice[1]
+|tr_comm
+>Svar32          1  1   97  1  1 25080 variables_fo 01-04-2013 16:00:33 choice[1]
+|tr_credit
+>Svar33          1  1   97  1  1 25888 variables_fo 01-04-2013 16:00:33 choice[1]
+|tr_equity
+>Svar34          1  1   97  1  1 26696 variables_fo 01-04-2013 16:00:33 choice[1]
+|tr_foreign_ex
+>Svar35          1  1   97  1  1 27504 variables_fo 01-04-2013 16:00:33 choice[1]
+|tr_int_rt_exp
+>Svar36          1  1   97  1  1 28312 variables_fo 01-04-2013 16:00:33 choice[1]
+|vc_rev
+>Svar37          1  1   97  1  1 29120 variables_fo 01-04-2013 16:00:33 choice[2]
+|PRIV.NVC.EWMA|NA
+>Svar38          1  1   97  1  1 29928 variables_fo 01-04-2013 16:00:33 choice[2]
+|PRIV.NVC.PEA|NA
+>Svar39          1  1   97  1  1 30736 variables_fo 01-04-2013 16:00:33 choice[2]
+|PRIV.PLACE.FIN.LP.SDC|NA
+>Svar40          1  1   97  1  1 31544 variables_fo 01-04-2013 16:00:33 choice[2]
+|PRIV.PLACE.FIN.SDC|NA
+>Svar41          1  1   97  1  1 32352 variables_fo 01-04-2013 16:00:33 choice[2]
+|PRIV.PLACE.NF.SDC|NA
+>Svar42          1  1   97  1  1 33160 variables_fo 01-04-2013 16:00:33 choice[2]
+|PRIV.TOTAL|NA
+>Svar43          1  1   97  1  1 33968 variables_fo 01-04-2013 16:00:33 choice[2]
+|PRIV.VC.PWC|NA
+>Svar44          1  1   97  1  1 34776 variables_fo 01-04-2013 16:00:33 choice[1]
+|MERG.ANN.DOM.CASH
+>Svar45          1  1   97  1  1 35584 variables_fo 01-04-2013 16:00:33 choice[2]
+|MERG.COMP.DOM.CASH|NA
+>Svar46          1  1   97  1  1 36392 variables_fo 01-04-2013 16:00:33 choice[2]
+|MERG.COMP.DOM.LIAB|NA
+>Svar47          1  1   97  1  1 37200 variables_fo 01-04-2013 16:00:33 choice[2]
+|MERG.COMP.DOM.STOCK|NA
+>Svar48          1  1   97  1  1 38008 variables_fo 01-04-2013 16:00:33 choice[2]
+|MERG.COMP.FOR.CASH|NA
+>Svar49          1  1   97  1  1 38816 variables_fo 01-04-2013 16:00:33 choice[2]
+|MERG.COMP.FOR.LIAB|NA
+>Svar50          1  1   97  1  1 39624 variables_fo 01-04-2013 16:00:33 choice[2]
+|MERG.COMP.FOR|NA
+>Svar51          1  1   97  1  1 40432 variables_fo 01-04-2013 16:00:33 choice[2]
+|MERG.COMP.FOR.STOCK|NA
+>Svar52          1  1   97  1  1 41240 variables_fo 01-04-2013 16:00:33 choice[1]
+|US GDP
+>Svar53          1  1   97  1  1 42048 variables_fo 01-04-2013 16:00:33 choice[1]
+|Baltic Dry Index
+>Svar54          1  1   97  1  1 42856 variables_fo 01-04-2013 16:00:33 choice[1]
+|euro_area_gdp
+>Svar55          1  1   97  1  1 43664 variables_fo 01-04-2013 16:00:33 choice[1]
+|jp_gdp
+>Svar56          1  1   97  1  1 44472 variables_fo 01-04-2013 16:00:33 choice[1]
+|gb_gdp
+>Svar57          1  1   97  1  1 45280 variables_fo 01-04-2013 16:00:33 choice[1]
+|mx_gdp
+>Svar58          1  1   97  1  1 46088 variables_fo 01-04-2013 16:00:33 choice[1]
+|la_gdp
+>Svar59          1  1   97  1  1 46896 variables_fo 01-04-2013 16:00:33 choice[1]
+|GSCI
+>Svar60          1  1   97  1  1 47704 variables_fo 01-04-2013 16:00:33 choice[1]
+|MSCI EURO WORLD INDEX
+>Svar61          1  1   97  1  1 48512 variables_fo 01-04-2013 16:00:33 choice[1]
+|Henry Hub Natural Gas
+>Svar62          1  1   97  1  1 49320 variables_fo 01-04-2013 16:00:33 choice[1]
+|Brent Crude Oil
+>Svar63          1  1   97  1  1 50128 variables_fo 01-04-2013 16:00:33
+>Svar64          1  1   97  1  1 50936 variables_fo 01-04-2013 16:00:33 choice[1]
+|NF.INV
+>Svar65          1  1   97  1  1 51744 variables_fo 01-04-2013 16:00:33 choice[1]
+|NF.JUNK
+>Svar66          1  1   97  1  1 52552 variables_fo 01-04-2013 16:00:33 choice[1]
+|NF.UNRATED
+>Svar67          1  1   97  1  1 53360 variables_fo 01-04-2013 16:00:33 choice[1]
+|FIN.INV
+>Svar68          1  1   97  1  1 54168 variables_fo 01-04-2013 16:00:33 choice[1]
+|FIN.JUNK
+>Svar69          1  1   97  1  1 54976 variables_fo 01-04-2013 16:00:33 choice[1]
+|FIN.UNRATED
+>Svar70          1  1   97  1  1 55784 variables_fo 01-04-2013 16:00:33 choice[1]
+|ISS.DOM.MFG
+>Svar71          1  1   97  1  1 56592 variables_fo 01-04-2013 16:00:33 choice[1]
+|ISS.DOM.COMM
+>Svar72          1  1   97  1  1 57400 variables_fo 01-04-2013 16:00:33 choice[1]
+|ISS.DOM.ELECT
+>Svar73          1  1   97  1  1 58208 variables_fo 01-04-2013 16:00:33 choice[1]
+|ISS.DOM.TRANS
+>Svar74          1  1   97  1  1 59016 variables_fo 01-04-2013 16:00:33 choice[1]
+|ISS.DOM.TELE
+>Svar75          1  1   97  1  1 59824 variables_fo 01-04-2013 16:00:33 choice[1]
+|ISS.DOM.FIN
+>Svar76          1  1   97  1  1 60632 variables_fo 01-04-2013 16:00:33 choice[1]
+|NF.YANKEE
+>Svar77          1  1   97  1  1 61440 variables_fo 01-04-2013 16:00:33 choice[1]
+|FIN.YANKEE
+>Svar78          1  1   97  1  1 62248 variables_fo 01-04-2013 16:00:33 choice[1]
+|SVENPY1000
+>Svar79          1  1   97  1  1 63056 variables_fo 01-04-2013 16:00:33 choice[1]
+|3Mo Treasury Yield Quarterly Converted
+>Svar80          1  1   97  1  1 63864 variables_fo 01-04-2013 16:00:33 choice[1]
+|10Yr Treasury Yield Quarterly Converted
+>Svar81          1  1   97  1  1 64672 variables_fo 01-04-2013 16:00:33 choice[1]
+|U.S. Natural Gas quarterly converted
+>Svar82          1  1   97  1  1 65480 variables_fo 01-04-2013 16:00:33 choice[1]
+|bbb10yr quarterly converted
+>Svar83          1  1   97  1  1 66288 variables_fo 01-04-2013 16:00:33 choice[1]
+|VIX
+>Svar84          1  1   97  1  1 67096 variables_fo 01-04-2013 16:00:33 choice[1]
+|SP500
+>Svar85          1  1   97  1  1 67904 variables_fo 01-04-2013 16:00:33 choice[1]
+|us ipo

@@ -1,0 +1,167 @@
+pcgive 700
+data variables_for_OxMetrics.bn7
+>assets       1990  1 2012  4  4 32 variables_fo 02-04-2013 08:39:07 choice[1]
+|assets
+>total_nii    1990  1 2012  4  4 800 variables_fo 02-04-2013 08:39:07 choice[1]
+|total_nii
+>normalized_nii 1990  1 2012  4  4 1568 variables_fo 02-04-2013 08:39:07 choice[1]
+|normalized_nii
+>credit_loss_allowances 1990  1 2012  4  4 2336 variables_fo 02-04-2013 08:39:07 choice[1]
+|credit_loss_allowances
+>card_interchange_fees 1990  1 2012  4  4 3104 variables_fo 02-04-2013 08:39:07 choice[1]
+|card_interchange_fees
+>earnings_life_insurance 1990  1 2012  4  4 3872 variables_fo 02-04-2013 08:39:07 choice[1]
+|earnings_life_insurance
+>atm_fees     1990  1 2012  4  4 4640 variables_fo 02-04-2013 08:39:07 choice[1]
+|atm_fees
+>check_printing_fees 1990  1 2012  4  4 5408 variables_fo 02-04-2013 08:39:07 choice[1]
+|check_printing_fees
+>fiduciary_activities 1990  1 2012  4  4 6176 variables_fo 02-04-2013 08:39:07 choice[1]
+|fiduciary_activities
+>sale_mutual_funds 1990  1 2012  4  4 6944 variables_fo 02-04-2013 08:39:07 choice[1]
+|sale_mutual_funds
+>insurance_commissions 1990  1 2012  4  4 7712 variables_fo 02-04-2013 08:39:07 choice[1]
+|insurcance_commissions
+>investment_banking_fees 1990  1 2012  4  4 8480 variables_fo 02-04-2013 08:39:07 choice[1]
+|investment_banking_fees
+>net_change_fair_value 1990  1 2012  4  4 9248 variables_fo 02-04-2013 08:39:07 choice[1]
+|net_change_fair_value
+>ng_assets_fv 1990  1 2012  4  4 10016 variables_fo 02-04-2013 08:39:07 choice[1]
+|ng_assets_fv
+>ng_credit_derivatives 1990  1 2012  4  4 10784 variables_fo 02-04-2013 08:39:07 choice[1]
+|ng_credit_deriv
+>ng_sale_loans 1990  1 2012  4  4 11552 variables_fo 02-04-2013 08:39:07 choice[1]
+|ng_sale_loans
+>ng_other_assets 1990  1 2012  4  4 12320 variables_fo 02-04-2013 08:39:07 choice[1]
+|ng_other_assets
+>ng_other_real_estate 1990  1 2012  4  4 13088 variables_fo 02-04-2013 08:39:07 choice[1]
+|ng_other_real_estate
+>net_sec_income 1990  1 2012  4  4 13856 variables_fo 02-04-2013 08:39:07 choice[1]
+|net_sec_income
+>net_servicing_fees 1990  1 2012  4  4 14624 variables_fo 02-04-2013 08:39:07 choice[1]
+|net_servicing_fees
+>res_mortgages_close 1990  1 2012  4  4 15392 variables_fo 02-04-2013 08:39:07 choice[1]
+|res_mortgages_closed
+>res_mortgages_open 1990  1 2012  4  4 16160 variables_fo 02-04-2013 08:39:07 choice[1]
+|res_mortgages_open
+>other_adj_equity 1990  1 2012  4  4 16928 variables_fo 02-04-2013 08:39:07 choice[1]
+|other_adj_equity
+>other_nii    1990  1 2012  4  4 17696 variables_fo 02-04-2013 08:39:07 choice[1]
+|other_nii
+>rent_other_real_estate 1990  1 2012  4  4 18464 variables_fo 02-04-2013 08:39:07 choice[1]
+|rent_other_real_estate
+>safe_deposit_rent 1990  1 2012  4  4 19232 variables_fo 02-04-2013 08:39:07 choice[1]
+|safe_deposit_rent
+>service_charges 1990  1 2012  4  4 20000 variables_fo 02-04-2013 08:39:07 choice[1]
+|service_charges
+>total_tr     1990  1 2012  4  4 20768 variables_fo 02-04-2013 08:39:07 choice[1]
+|total_tr
+>tr_commodities 1990  1 2012  4  4 21536 variables_fo 02-04-2013 08:39:07 choice[1]
+|tr_comm
+>tr_credit    1990  1 2012  4  4 22304 variables_fo 02-04-2013 08:39:07 choice[1]
+|tr_credit
+>tr_equities  1990  1 2012  4  4 23072 variables_fo 02-04-2013 08:39:07 choice[1]
+|tr_equity
+>tr_foreign_exchange_exposure 1990  1 2012  4  4 23840 variables_fo 02-04-2013 08:39:07 choice[1]
+|tr_foreign_ex
+>tr_interest_rate_exposure 1990  1 2012  4  4 24608 variables_fo 02-04-2013 08:39:07 choice[1]
+|tr_int_rt_exp
+>venture_capital_revenue 1990  1 2012  4  4 25376 variables_fo 02-04-2013 08:39:07 choice[1]
+|vc_rev
+>priv.nvc.ewma 1990  1 2012  4  4 26144 variables_fo 02-04-2013 08:39:07 choice[2]
+|PRIV.NVC.EWMA|NA
+>priv.nvc.pea 1990  1 2012  4  4 26912 variables_fo 02-04-2013 08:39:07 choice[2]
+|PRIV.NVC.PEA|NA
+>priv.place.fin.lp.sdc 1990  1 2012  4  4 27680 variables_fo 02-04-2013 08:39:07 choice[2]
+|PRIV.PLACE.FIN.LP.SDC|NA
+>priv.place.fin.sdc 1990  1 2012  4  4 28448 variables_fo 02-04-2013 08:39:07 choice[2]
+|PRIV.PLACE.FIN.SDC|NA
+>priv.place.nf.sdc 1990  1 2012  4  4 29216 variables_fo 02-04-2013 08:39:07 choice[2]
+|PRIV.PLACE.NF.SDC|NA
+>priv.total   1990  1 2012  4  4 29984 variables_fo 02-04-2013 08:39:07 choice[2]
+|PRIV.TOTAL|NA
+>priv.vc.pwc  1990  1 2012  4  4 30752 variables_fo 02-04-2013 08:39:07 choice[2]
+|PRIV.VC.PWC|NA
+>merg.ann.dom.cash 1990  1 2012  4  4 31520 variables_fo 02-04-2013 08:39:07 choice[1]
+|MERG.ANN.DOM.CASH
+>merg.comp.dom.cash 1990  1 2012  4  4 32288 variables_fo 02-04-2013 08:39:07 choice[2]
+|MERG.COMP.DOM.CASH|NA
+>merg.comp.dom.liab 1990  1 2012  4  4 33056 variables_fo 02-04-2013 08:39:07 choice[2]
+|MERG.COMP.DOM.LIAB|NA
+>merg.comp.dom.stock 1990  1 2012  4  4 33824 variables_fo 02-04-2013 08:39:07 choice[2]
+|MERG.COMP.DOM.STOCK|NA
+>merg.comp.for.cash 1990  1 2012  4  4 34592 variables_fo 02-04-2013 08:39:07 choice[2]
+|MERG.COMP.FOR.CASH|NA
+>merg.comp.for.liab 1990  1 2012  4  4 35360 variables_fo 02-04-2013 08:39:07 choice[2]
+|MERG.COMP.FOR.LIAB|NA
+>merg.comp.for 1990  1 2012  4  4 36128 variables_fo 02-04-2013 08:39:07 choice[2]
+|MERG.COMP.FOR|NA
+>merg.comp.for.stock 1990  1 2012  4  4 36896 variables_fo 02-04-2013 08:39:07 choice[2]
+|MERG.COMP.FOR.STOCK|NA
+>us_gdp       1990  1 2012  4  4 37664 variables_fo 02-04-2013 08:39:07 choice[1]
+|US GDP
+>baltic_dry_index 1990  1 2012  4  4 38432 variables_fo 02-04-2013 08:39:07 choice[1]
+|Baltic Dry Index
+>euro_area_gdp 1990  1 2012  4  4 39200 variables_fo 02-04-2013 08:39:07 choice[1]
+|euro_area_gdp
+>japan_gdp    1990  1 2012  4  4 39968 variables_fo 02-04-2013 08:39:07 choice[1]
+|jp_gdp
+>great_brittain_gdp 1990  1 2012  4  4 40736 variables_fo 02-04-2013 08:39:07 choice[1]
+|gb_gdp
+>mexico_gdp   1990  1 2012  4  4 41504 variables_fo 02-04-2013 08:39:07 choice[1]
+|mx_gdp
+>latin_america_gdp 1990  1 2012  4  4 42272 variables_fo 02-04-2013 08:39:07 choice[1]
+|la_gdp
+>gsci         1990  1 2012  4  4 43040 variables_fo 02-04-2013 08:39:07 choice[1]
+|GSCI
+>msci_euro_world_index 1990  1 2012  4  4 43808 variables_fo 02-04-2013 08:39:07 choice[1]
+|MSCI EURO WORLD INDEX
+>henry_hub_natural_gas 1990  1 2012  4  4 44576 variables_fo 02-04-2013 08:39:07 choice[1]
+|Henry Hub Natural Gas
+>brent_crude_oil 1990  1 2012  4  4 45344 variables_fo 02-04-2013 08:39:07 choice[1]
+|Brent Crude Oil
+>Svar63       1990  1 2012  4  4 46112 variables_fo 02-04-2013 08:39:07
+>nf.inv       1990  1 2012  4  4 46880 variables_fo 02-04-2013 08:39:07 choice[1]
+|NF.INV
+>nf.junk      1990  1 2012  4  4 47648 variables_fo 02-04-2013 08:39:07 choice[1]
+|NF.JUNK
+>nf.unrated   1990  1 2012  4  4 48416 variables_fo 02-04-2013 08:39:07 choice[1]
+|NF.UNRATED
+>fin.inv      1990  1 2012  4  4 49184 variables_fo 02-04-2013 08:39:07 choice[1]
+|FIN.INV
+>fin.junk     1990  1 2012  4  4 49952 variables_fo 02-04-2013 08:39:07 choice[1]
+|FIN.JUNK
+>fin.unrated  1990  1 2012  4  4 50720 variables_fo 02-04-2013 08:39:07 choice[1]
+|FIN.UNRATED
+>iss.dom.mfg  1990  1 2012  4  4 51488 variables_fo 02-04-2013 08:39:07 choice[1]
+|ISS.DOM.MFG
+>iss.dom.comm 1990  1 2012  4  4 52256 variables_fo 02-04-2013 08:39:07 choice[1]
+|ISS.DOM.COMM
+>iss.dom.elect 1990  1 2012  4  4 53024 variables_fo 02-04-2013 08:39:07 choice[1]
+|ISS.DOM.ELECT
+>iss.dom.trans 1990  1 2012  4  4 53792 variables_fo 02-04-2013 08:39:07 choice[1]
+|ISS.DOM.TRANS
+>iss.dom.tele 1990  1 2012  4  4 54560 variables_fo 02-04-2013 08:39:07 choice[1]
+|ISS.DOM.TELE
+>iss.dom.fin  1990  1 2012  4  4 55328 variables_fo 02-04-2013 08:39:07 choice[1]
+|ISS.DOM.FIN
+>nf.yankee    1990  1 2012  4  4 56096 variables_fo 02-04-2013 08:39:07 choice[1]
+|NF.YANKEE
+>fin.yankee   1990  1 2012  4  4 56864 variables_fo 02-04-2013 08:39:07 choice[1]
+|FIN.YANKEE
+>svenpy1000   1990  1 2012  4  4 57632 variables_fo 02-04-2013 08:39:07 choice[1]
+|SVENPY1000
+>3Mo_tr_yield 1990  1 2012  4  4 58400 variables_fo 02-04-2013 08:39:07 choice[1]
+|3Mo Treasury Yield Quarterly Converted
+>10yr_tr_yield 1990  1 2012  4  4 59168 variables_fo 02-04-2013 08:39:07 choice[1]
+|10Yr Treasury Yield Quarterly Converted
+>us_natural_gas 1990  1 2012  4  4 59936 variables_fo 02-04-2013 08:39:07 choice[1]
+|U.S. Natural Gas quarterly converted
+>bbb10yr      1990  1 2012  4  4 60704 variables_fo 02-04-2013 08:39:07 choice[1]
+|bbb10yr quarterly converted
+>vix          1990  1 2012  4  4 61472 variables_fo 02-04-2013 08:39:07 choice[1]
+|VIX
+>sp500        1990  1 2012  4  4 62240 variables_fo 02-04-2013 08:39:07 choice[1]
+|SP500
+>us_ipo       1990  1 2012  4  4 63008 variables_fo 02-04-2013 08:39:07 choice[1]
+|us ipo
