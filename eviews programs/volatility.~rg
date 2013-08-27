@@ -1,0 +1,6 @@
+'Volitility equations
+equation volatility1.ls nii nii(-1) pca_vix(-1)
+
+'This equation is statitically significant--but not for the full sample.
+
+

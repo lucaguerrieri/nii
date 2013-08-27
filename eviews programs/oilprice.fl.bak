@@ -1,0 +1,10 @@
+//Batch code for oil prices
+module("PcGive");
+package("PcGive", "Single-equation");
+usedata("noninterest_income_data_forOxMetrics.xlsx");
+system
+{
+Y=normalized_nii;
+Z=constant,oil price;
+}
+estimate("OLS",1996, 1, 2012, 4);

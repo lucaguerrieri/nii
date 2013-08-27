@@ -1,0 +1,20 @@
+//Batch code for test1
+		module("PcGive");
+		package("PcGive", "Single-equation");
+		usedata ("normalized_variables_for_OxMetrics.xlsx");
+		system
+				{
+		     Y= nii;
+			 Z= Constant, pca_priv_ewma_iss_nonvc, pca_piv_eq_iss_nonvc, pca_priv_place_fin_lp_sdc, pca_priv_place_fin_sdc, pca_priv_place_sdc_nonfin,
+			 pca_total_iss, pca_priv_vc_pwc, pca_cash_val_ann_dom_merg, pca_cash_val_comp_dom_merg, pca_liab_val_comp_dom_merg,
+			 pca_stock_val_comp_dom_merg, pca_cash_val_for_comp_merg, pca_liab_comp_for_merg, pca_comp_for_merg, pca_stock_val_comp_for_merg,
+			 US_GDP, pca_baltic_dry, euro_area_gdp, jp_gdp, gb_gdp, mx_gdp, la_gdp, pca_gsci, pca_hhub_nat_gas, pca_brent_crude, pca_nf_junk_iss,
+			 pca_nf_unrated_iss, pca_fin_junk_iss, pca_fin_unrated_iss, pca_iss_dom_mfg, pca_iss_dom_elec, pca_iss_dom_trans, pca_iss_dom_tele,
+			 pca_iss_dom_fin, pca_nf_for_us_corp_iss, pca_fin_for_us_corp_iss, pca_3mo_tr_yield, pca_10yr_tr_yield, pca_us_nat_gas, pca_bbb10yr,
+			 pca_vix, pca_sp500, pca_us_ipo, pca_us_ipo, pca_us_dpi, pca_us_dpi_nom, pca_us_ur, pca_us_inflation, pca_us_corp,
+			 pca_us_mort, pca_us_hpi, pca_us_cre;
+		}									  
+		estimate("OLS", 1999, 1, 2012, 3);
+		saveresults("test.out");
+		testsummary;
+		break;
