@@ -5,18 +5,35 @@ setpath;
 
 dataset_option = 1;
 
-[yobs, dates, yields, nims, nfactors, nothers, tau, factors,...
-    shadow_bank_share_assets,...
-    total_interest_earning_assets,...
-    assets_depository_inst, assets_securities_notrade,...
-    assets_fedfunds, assets_all_loans, assets_trading_accnts, ... 
-    interest_income_to_ie_assets, interest_expense_to_ie_assets] = load_data_ml(dataset_option);
+%[yobs, dates, yields, nims, nfactors, nothers, tau, factors,...
+    %shadow_bank_share_assets,...
+    %total_interest_earning_assets,...
+   % assets_depository_inst, assets_securities_notrade,...
+    %assets_fedfunds, assets_all_loans, assets_trading_accnts, ... 
+   % interest_income_to_ie_assets, interest_expense_to_ie_assets] = load_data_ml(dataset_option);
+   
+  start_yobs = 1996.75;
+end_yobs = 2012.75;
+dates = start_yobs:.25:end_yobs;
+
+
+
+    nii = csvread('../data/normalized_variables.csv');
+
+start_pos = find(dates==start_yobs);
+end_pos = find(dates==end_yobs);
+nii = nii(start_pos:end_pos,:)';
+nii_varlist = char('assets','nii', 'US_GDP', 'euro_area_gdp', 'jp_gdp', 'la_gdp',...
+    'pca_hhub_nat_gas','pca_brent_crude','pca_3mo_tr_yield','pca_10yr_tr_yield',...
+    'pca_bbb10yr','pca_vix','pca_sp500','pca_us_ipo','pca_us_dpi','pca_us_ur',...
+    'pca_us_mort','pca_us_hpi');
  
 out_of_sample_start_pos = find(dates==2000.0);
 end_sample_pos = length(dates);
 
-nstates = nfactors + nothers;
-ntaus = length(tau);
+%nstates = nfactors + nothers;
+%ntaus = length(tau);
+
 
 
 
@@ -31,20 +48,20 @@ forecast_horizon = 10;
 lag = 1;
 
 % Table 1 -- Shortened sample:
-[rmse_forecast_combination_mat1, forecast_combination_mat1] = calc_rmse_forecast_combination_conditional(nims(:,15:end),yields(:,15:end), out_of_sample_start_pos-14, end_sample_pos-14, forecast_horizon, 1,4);
+[rmse_forecast_combination_mat1, forecast_combination_mat1] = calc_rmse_forecast_combination_conditional(nii(:,15:end),nii_varlist(:,15:end), out_of_sample_start_pos-14, end_sample_pos-14, forecast_horizon, 1,4);
 
-[rmse_multivariate_mat1, forecast_multivariate_mat1] = calc_rmse_multivariate_conditional(nims(:,15:end), factors(:,15:end), out_of_sample_start_pos-14, end_sample_pos-14, forecast_horizon, lag);
+[rmse_multivariate_mat1, forecast_multivariate_mat1] = calc_rmse_multivariate_conditional(nii(:,15:end), nii_varlist(:,15:end), out_of_sample_start_pos-14, end_sample_pos-14, forecast_horizon, lag);
 
 
 npc = 3;
-[rmse_pc_mat1, forecast_pc_mat1] = calc_rmse_pc(nims(:,15:end), yields(:,15:end), out_of_sample_start_pos-14, end_sample_pos-14, forecast_horizon, npc);
+[rmse_pc_mat1, forecast_pc_mat1] = calc_rmse_pc(nii(:,15:end), nii_varlist(:,15:end), out_of_sample_start_pos-14, end_sample_pos-14, forecast_horizon, npc);
 
 
-[rmse_forecast_combination_mat3, forecast_combination_mat3] = calc_rmse_forecast_combination_conditional(nims(:,15:end),factors(:,15:end), out_of_sample_start_pos-14, end_sample_pos-14, forecast_horizon, 1,4);
+[rmse_forecast_combination_mat3, forecast_combination_mat3] = calc_rmse_forecast_combination_conditional(nii(:,15:end),nii_varlist(:,15:end), out_of_sample_start_pos-14, end_sample_pos-14, forecast_horizon, 1,4);
 
 varlag=4;
-[rmse_varmat2, forecast_var_mat2] = calc_rmse_var_conditional(nims(:,15:end), factors(:,15:end), out_of_sample_start_pos-14, end_sample_pos-14, forecast_horizon, varlag);
-[rmse_nochangemat1, forecast_nochange_mat1] = calc_rmse_nochange(nims(:,15:end), out_of_sample_start_pos-14, end_sample_pos-14, forecast_horizon);
+[rmse_varmat2, forecast_var_mat2] = calc_rmse_var_conditional(nii(:,15:end), nii_varlist(:,15:end), out_of_sample_start_pos-14, end_sample_pos-14, forecast_horizon, varlag);
+[rmse_nochangemat1, forecast_nochange_mat1] = calc_rmse_nochange(nii(:,15:end), out_of_sample_start_pos-14, end_sample_pos-14, forecast_horizon);
 
 
 
